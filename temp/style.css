@@ -1,0 +1,155 @@
+@charset "UTF-8";
+
+
+/*+++++++ BODY +++++++*/
+html {width: 100%;height: 100%;}
+body {font-family:"Courier New", Courier, monospace;font-size: 13px;color: #000000;background-color: #CCCCCC;}
+#canvas { margin:auto; margin-top:7%; height:475px; width:330px; }
+
+/*+++++++ H1,H2,H3 HYPERLINKS +++++++*/
+ a:link {color:#000000; text-decoration:none} 
+ a:hover { color:#FFFFFF;text-decoration:none }
+ a:visited {color:#000000;text-decoration:none}
+ a:visited:hover { color:#FFFFFF;text-decoration:none }
+ input[type="text"]:disabled {background: #dddddd;}
+
+ /*+++Menu+++++*/
+
+ .on{ text-decoration: line-through;}
+ .sub_menu{float: left;width: 270px; height:20px; padding-top:0px;margin-left:30px;}
+ .menu_general { width:310px; height:auto; float:left;border:0px  solid black; padding-bottom:10px;}
+ .menu_general_titulo { width:269px; height:auto; float:left; margin-top:10px; margin-left:20px; margin-bottom:10px; font-size:20px; }
+ .logout {float:right; font-size:6px; width:30px; padding-right:35px; padding-top:5px;}
+ .dispositivo_top{float: left;width: 110px; height:20px; padding-top:0px;margin-left:30px;}
+ .dispositivo{width: 110px; height:16px; padding-top:0px;margin-left:30px; float: left;}
+
+/*+++++++ MAIN +++++++*/
+
+#titulo { float: left; width: 310px; margin-left: 5px}
+#titulo1 {  width: auto;color:#FFFFFF; font-family:"Courier New", Courier, monospace; font-size:30px; }
+    
+/*+++++++ Divisiones +++++++*/
+
+#temp_max{; margin-left: 5px; float: left;}
+#temp_max_data{float:left; margin-left: 10px}
+#temp_min{float: right}
+#temp_min_data{float: right; margin-left: 10px;}
+
+
+
+/*+++++++ Ocultar +++++++*/
+
+#temporizador{display: none; background-color:#C2C2C2; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
+#dispositivos{display: none}
+#botones{display:block;}
+#bottom{display: none}
+#persiana{display: block}
+Informacion {visibility: hidden;}
+#save {display: none}
+#save2 {display: none}
+
+/*+++++++ Iconos de seleccion +++++++*/
+
+.centrador{float:right; margin-right: 30px; width: 40px; height: 40px;}
+.func{background-size: 30px 30px; background-repeat: no-repeat; background-position: center; margin: 2px; background-color: #DFDFDF; width: 40px; height: 40px; text-align: center; float: right; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
+#func1{ background-image:url("IMG/setting-icon4.png")}
+#func2{ background-image:url("IMG/timer-icon.png")}
+#func3{ background-image:url("IMG/persiana2.png")}
+#func4{ background-image:url("IMG/info-icon1.png") }
+
+#boton_up{background-image:url("IMG/arrow-down-icon2.png");-webkit-transform:rotate(180deg);-moz-transform:rotate(180deg); background-size: 30px 30px;background-repeat: no-repeat;background-position: center;}
+#boton_down{background-image:url("IMG/arrow-down-icon2.png"); background-size: 30px 30px;background-repeat: no-repeat;background-position: center;}
+#boton_st{background-image:url("IMG/stop-icon.png"); background-size: 30px 30px;background-repeat: no-repeat;background-position: center;}
+
+.per{background-size: 30px 30px; background-repeat: no-repeat; background-position: center; margin: 2px; background-color: #DFDFDF; width: 40px; height: 40px; text-align: center; float: left; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
+#per1{ background-image:url("IMG/television.png"); margin-left: 41px}
+#per2{ background-image:url("IMG/computer.png"); margin-left: 47px; background-size: 24px 27px}
+#per3{ background-image:url("IMG/habitacion2.png"); margin-left: 47px}
+#persiana{margin-top: 20px}
+#div-conf-time1{margin-top: 25px}
+#sdiv-conf-time1{margin-top: 23px}
+
+.funcNigth{background-size: 20px 20px; background-repeat: no-repeat; background-position: center; margin-right:10px; margin-top: 10px;  background-color: #DFDFDF; width: 20px; height: 20px; text-align: center; float: right; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
+
+#save{
+            background-image:url("IMG/save-icon.png"); 
+            position: absolute; 
+            bottom: 0px; left: 0px;
+            background-size: 16px 15px; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            margin: 2px; 
+            background-color: #DFDFDF; 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 5px 5px 5px 5px;
+            -moz-border-radius: 5px 5px 5px 5px;
+            -webkit-border-radius: 5px 5px 5px 5px; 
+}
+#save2{
+            margin-top: 8px;
+            background-image:url("IMG/save-icon.png"); 
+/*            position: absolute; 
+            bottom: 0px; left: 0px;*/
+            
+            float: left;
+            background-size: 16px 15px; 
+            background-repeat: no-repeat; 
+            background-position: center;  
+            background-color: #DFDFDF; 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 5px 5px 5px 5px;
+            -moz-border-radius: 5px 5px 5px 5px;
+            -webkit-border-radius: 5px 5px 5px 5px; 
+}
+
+#lock{background-image:url("IMG/lock.png"); 
+            position: absolute; 
+            bottom: 0px; right: 0px;
+            background-size: 20px 20px; 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            margin: 2px; 
+            background-color: #DFDFDF; 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 5px 5px 5px 5px;
+            -moz-border-radius: 5px 5px 5px 5px;
+            -webkit-border-radius: 5px 5px 5px 5px; 
+}
+/*+++++++ DIV PRINCIPALES +++++++*/
+
+#ack{ margin-left: 10px; padding-bottom: 50px;}
+
+#top { width:310px; height:auto; float:left; margin-left: 7px;}
+#top_down {width:310px; height:auto; float:left; margin-top:10px;background-color: #C2C2C2 }
+#top_up {position:relative;width:310px; height:auto; float:left;background-color: #C2C2C2;border-radius: 7px 7px 0px 0px;-moz-border-radius: 7px 7px 0px 0px;-webkit-border-radius: 7px 7px 0px 0px; }
+#bottom { width:310px; height:146px; float:left; margin-top:10px;border:0px  solid black;margin-left: 7px; background-color: #C2C2C2; border-radius: 0px 0px 7px 7px;-moz-border-radius: 0px 0px 7px 7px;-webkit-border-radius: 0px 0px 7px 7px;  }
+#funciones{ width: 310px; border:1px; float: left; height: 42px;position: relative; margin-left: 7px; margin-top: 15px}
+#descarga {visibility: hidden;}
+#Informacion { background-color: #C2C2C2}
+#config{ float:left; width: 309px; margin-top: 15px; border-top:1px  solid black; padding-top: 10px}
+
+/*+++++++++ Protec ++++++++++++ */
+#protec {width:250px; margin-left:auto; margin-right:auto; text-align:center; margin-top:7%; border: 1px solid black;}
+
+
+.name-data{ float:left; margin-left:39px; height: 20px; }
+.conf-ip{float: right; margin-right: 35px; margin-top: 6px}
+.conf-name{float: left; margin-left: 30px; margin-top: 10px}
+.conf-input{ float: left; width:100px; text-align: center; height: 13px;}
+.boton_per{ padding: 10px ;background-color: #DFDFDF; float: left; margin-left:30px; margin-top: 10px; height: 40px; border:0px  solid black; text-align: center;  width: 40px;border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px;}
+
+
+/*+++++++++ Pantalla Temporizador ++++++++++++ */
+#tempo_titul{ font-size: 15px; margin-top: 8px; margin-bottom: 8px; width: 86%; float: left; margin-left: 10px; }
+#tempo_show{ margin-left: 2%; margin-top: 4px; float: left;width: 95%; height: 39px; background-color: #DFDFDF; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
+.tempo_show_hour{ float: left; font-size: 25px; margin-left: 15px}
+.tempo_show_days{ float: left; margin-top: 10px; margin-left: 5px; width: 145px;}
+.tempo_day{float: left; margin-left: 0px; width: 20px;color: black}
+#tempo_show_check{ float: left; margin-top: 4px; margin-left: 10px;}
+.tempo_show_hour_2{ float: left; font-size: 20px; margin-left: 0px; margin-top: 3px; width: 58px; background-color: #DFDFDF; border: none; color: black}
+.tempo_check{margin-top: 7px; float: left}
+.short_check{margin-top: 10px; margin-left: 0px;}
+.short_check_img{ width: 10px; height: 10px; margin-top: 5px; float: left; margin-left: 7px;}
