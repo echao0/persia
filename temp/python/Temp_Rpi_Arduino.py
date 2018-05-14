@@ -75,9 +75,7 @@ working = False                                                                 
 DB_HOST = 'localhost' 
 DB_USER = 'persia' 
 DB_PASS = '/Persia/' 
-DB_NAME = 'temperatura'
-DB_TABLE = 'parciales'
-DB_TABLE_SAVE = 'historico'
+DB_NAME = 'persia'
 
 datos_sql = [DB_HOST, DB_USER, DB_PASS, DB_NAME]	#Array de tados SQL
 
@@ -375,23 +373,6 @@ def db_conexion(sql):						#Funcion para insertar/ rescatar datos en SQL
 
 	return result							#Fin de la funcion y retorno de los datos
 
-def average_temp():							# funcion para sacar la media diaria antes del borrado
-	
-	sql = "SELECT valor FROM " + DB_TABLE 	#Sacar todos los valores de la tabla parciales
-	result = db_conexion(sql)
-	
-	total_line = len(result) 				#saber la longitud del array retornado
-	
-	id = 0
-	total = 0
-	
-	while id < total_line :					#sumar todos los resultados en una unica variable
-		total = result[id] + total
-		id = id +1
-	
-	average = total / total_line			#Sacar la media dividiendo la suma total / el numero de resultados
-	
-	return average							#Retornar el array con el valor resultado
 						
 def date_time_old(method='0'):					#funcion que devuelve fechas, por defecto la actual . 1 = la fecha de ayer
 	
@@ -419,27 +400,6 @@ def date_time(method='0'):					#funcion que devuelve fechas, por defecto la actu
         if method == '3':
                 return time.strftime('%a')
             
-def get_insert_temp(time_starting_point):
-
-	#----- Introducir los valores de temperatura en la tabla parciales ---------------------#
-	#---------------------------------------------------------------------------------------#
-	
-	elapsed_time = time.time () - time_starting_point			#saber cuanto tiempo ha trascurrido desde el ultimo dato introducido
-	elapsed_time_int = int(elapsed_time)
-	
-	if elapsed_time_int > time_triger:							#Comparar el tiempo trascurrido desde que se introdujo el ultimo dato y el tiempo definido
-		
-		time_starting_point = time.time()						#Guardo el tiempo de el ultimo dato insertado en DB
-		
-		#rec_data, addr = ardu_output("t",ip_disp1)                                            #Le pido a arduino la temperatura actual esp8266
-                if (rec_data != 0 ):
-    
-                        temp = float(rec_data) 								#Convert string rec_data to float temp
-			sql = query = "INSERT INTO " + DB_TABLE + " (valor) VALUES ('%s')" % temp
-			db_conexion(sql) 									#Insertar valor de temperatura en SQL 
-			return 1			
-		else:
-			pass	
 	
         
 def ardu_output(data,disp):
@@ -710,50 +670,6 @@ try:
                         
                     outTimer = False
                 time.sleep(sleep_time)
-
-	#----- Preparar valor maximo, medio y minimo en la tabla historico a las 23:59:58 ---------#
-	#------------------------------------------------------------------------------------------#
-		#get_insert_temp()									#Recoger e insertar la temperatura en la tabla de parciales
-		
-#		if time.strftime("%S") >= "58" and time.strftime("%S") <= "59" :
-#			if time.strftime("%M") == "59": 
-#				if time.strftime("%H") == "23":
-#					
-#					sql = "INSERT INTO " + DB_TABLE_SAVE + " (Valor, fecha) select valor , fecha from " + DB_TABLE + "  where valor in (select max(valor) from " + DB_TABLE + " ) limit 1"
-#					db_conexion(sql) 								#Insertar valor MAX de temperatura en SQL
-#					
-#					sql = "UPDATE " + DB_TABLE_SAVE + " SET `type`='max' ORDER BY id DESC LIMIT 1"	
-#					db_conexion(sql)								#Insertar el valor en la columna type de SQL
-#
-#					sql = "INSERT INTO " + DB_TABLE_SAVE + " (Valor, fecha) select valor , fecha from " + DB_TABLE + "  where valor in (select min(valor) from " + DB_TABLE + " ) limit 1"
-#					db_conexion(sql) 								#Insertar valor MIN de temperatura en SQL
-#					
-#					sql = "UPDATE " + DB_TABLE_SAVE + " SET `type`='min' ORDER BY id DESC LIMIT 1"	
-#					db_conexion(sql)								#Insertar el valor en la columna type de SQL
-#					
-#					sql = "insert into " + DB_TABLE_SAVE + " (valor, type, fecha) values (" + str(average_temp()) + " , 'med', '" + date_time('1') + "' )"
-#					db_conexion(sql)								#Insertar valor MED de temperatura en SQL
-#					
-#					sql = "truncate " + DB_TABLE
-#					db_conexion(sql)								#Borrar la tabla de parciales de SQL
-#					
-#					time.sleep(1)
-					
-		
-	#------------- Comprobar tiempo para saber si arduino esta vivo ------------------------#
-	#------------- Insertar temperatura en tabla parciales ---------------------------------#
-
-#
-#		elapsed_time_alive = time.time () - time_starting_point_alive			#saber cuanto tiempo ha trascurrido desde el ultimo dato introducido
-#		elapsed_time_int_alive = int(elapsed_time_alive)
-#		
-#		if elapsed_time_int_alive > time_alive:							#Comparar el tiempo trascurrido desde que se introdujo el ultimo dato y el tiempo definido
-#			
-#			
-#			
-#			time_starting_point_alive = time.time()						#Guardo el tiempo de la ultima pregunta de alive
-#                                            
-        										#Esperar para controlar el uso de CPU de RPI
 		
 except KeyboardInterrupt:
     if python_args.verbose:
