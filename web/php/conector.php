@@ -7,7 +7,7 @@ class Table{
             $server = "localhost";
             $usuario = "persia";
             $pass = "/Persia/";
-            $BD = "temperatura";
+            $BD = "persia";
             //variable que guarda la conexión de la base de datos
             $conexion = mysqli_connect($server, $usuario, $pass, $BD); 
             //Comprobamos si la conexión ha tenido exito
@@ -59,21 +59,6 @@ class Table{
         }
         
     function getAllInfo($type , $disp, $field, $data, $short){
-	
-	    if ($type == 'max'){
-        	//Creamos la consulta
-        	$sql = "SELECT * FROM historico where type = 'max';";
-        }
-        
-        if ($type == 'min'){
-        	//Creamos la consulta
-        	$sql = "SELECT * FROM historico where type = 'min';";
-        }
-        
-        if ($type == 'parc'){
-        	//Creamos la consulta
-        	$sql = "SELECT * FROM parciales";
-        }
         
         if ($type == 'status'){
         	//Creamos la consulta

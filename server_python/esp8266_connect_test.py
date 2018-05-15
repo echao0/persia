@@ -3,12 +3,10 @@ import time
 import argparse 
 import sys
 
-
-    
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-ip", "--ip", help="python esp8266_connect_test -ip 192.168.3.171 -c COMANDO")
-parser.add_argument("-c", "--command", help="p -> Latido ; s -> Subir ; b -> Bajar ; z -> Stop")
+parser.add_argument("-c", "--command", help="p -> Alive ; s -> Up ; b -> down ; z -> Stop")
 
 python_args = parser.parse_args()
 
