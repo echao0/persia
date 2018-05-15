@@ -1,0 +1,15 @@
+1. Requirements
+	
+	1.1-Hardware min
+			Rpi 1
+	
+	1.2-Software
+			Root access
+			Arduino IDE
+			Python 2.7
+			MySql
+			Phpmyadmin (just for make it easy)
+			apache2 or similar
+			
+Repo files ;P
+		
