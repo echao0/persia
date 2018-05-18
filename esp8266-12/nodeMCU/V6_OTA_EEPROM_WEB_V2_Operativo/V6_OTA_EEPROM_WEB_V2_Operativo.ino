@@ -134,7 +134,8 @@ void loop() {
              IPAddress gateway(192,168,4,1);
              IPAddress subnet(255,255,255,0);
              
-            
+            WiFiServer server(80);
+            server.begin();
             
             Serial.print("Setting soft-AP configuration ... ");
             Serial.println(WiFi.softAPConfig(local_IP, gateway, subnet) ? "Ready" : "Failed!");
@@ -236,7 +237,7 @@ void loop() {
                                     
                                     client.println("<!DOCTYPE HTML>");
                                     client.println("<html>");
-                                    client.println("<head><title>LaLU config :) </title>");
+                                    client.println("<head><title>Persia disp config :) </title>");
                                       
                                     client.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /></head>");
                                     client.println("<body><h1> Configuración de Dispositivo</h1>");
@@ -267,8 +268,6 @@ void loop() {
                                     client.println("</body></html>");
                                     
                                     delay(1);
-                                    Serial.println("respuesta enviada");
-                                    Serial.println();
                                     
                                }
                         //-------------------------------------------------------------------------------------------------
@@ -302,7 +301,6 @@ void loop() {
     Serial.println(linea1);
 
     if (linea1 == "OTA" ) {
-      Serial.println("Llamada a OTA");
       client.println("OTA ONLINE");
       OTA();
     }
