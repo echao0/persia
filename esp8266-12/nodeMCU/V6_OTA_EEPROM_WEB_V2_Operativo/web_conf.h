@@ -21,7 +21,7 @@ void web_conf(){
             Serial.println(WiFi.softAPConfig(local_IP, gateway, subnet) ? "Ready" : "Failed!");
           
             Serial.print("Setting soft-AP ... ");
-            Serial.println(WiFi.softAP("ESPsoftAP_01") ? "Ready" : "Failed!");
+            Serial.println(WiFi.softAP("Persia_web_conf") ? "Ready" : "Failed!");
           
             Serial.print("Soft-AP IP address = ");
             Serial.println(WiFi.softAPIP());
@@ -45,18 +45,18 @@ void web_conf(){
 
                         //-------------------------------------------------------------------------------------------------
                         WiFiClient client = server.available();
-                         if (client) //Si hay un cliente presente
+                         if (client) 
                                { 
                                   Serial.println("Nuevo Cliente");
                                   
                                   
-                                  //esperamos hasta que hayan datos disponibles
+                                  //wait for data
                                   while(!client.available()&&client.connected())
                                   {
                                   delay(1);
                                   }
                                   
-                                  // Leemos la primera línea de la petición del cliente.
+                                  // read firts line of the client
                                   String linea1 = client.readStringUntil('r');
                                   Serial.println(linea1);
 
