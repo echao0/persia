@@ -8,9 +8,6 @@
 #include "eeprom.h"
 //--------------------------
 
-const char* ssid = "ssid";
-const char* password = "password";
-
 IPAddress ip(0,0,0,0); // where xx is the desired IP Address
 IPAddress gateway(0,0,0,0); // set gateway to match your network
 IPAddress subnet(0,0,0,0); // set subnet mask to match your
@@ -37,8 +34,8 @@ void setup() {
 Serial.begin(115200);
 delay(10);
 
-strcat(wifi_ssid_private, "ssid");
-strcat(wifi_password_private, "password");
+//strcat(wifi_ssid_private, "ssid");
+//strcat(wifi_password_private, "password");
 
 
 // ---- Leer los datos de configuracion desde EEPROM
@@ -59,7 +56,7 @@ gateway.fromString(egateway);
 
 delay(500);
 
-Serial.print("Nomnre de la wifi: ");
+Serial.print("Nombre de la wifi: ");
 Serial.println(wifi_ssid_private);
 Serial.print("Password de la wifi: ");
 Serial.println(wifi_password_private);
@@ -87,16 +84,20 @@ Serial.println(gateway);
   Serial.println();
   Serial.println();
   Serial.print("Conectandose a red : ");
-  Serial.println(ssid);
+  Serial.println(wifi_ssid_private);
 
   WiFi.mode(WIFI_STA); //especifico que no quiero crear wifi
   WiFi.config(ip, gateway, subnet);
-  WiFi.begin(ssid, password); //Conexión a la red
+  WiFi.begin(wifi_ssid_private, wifi_password_private); //Conexión a la red
 
-  while (WiFi.status() != WL_CONNECTED)
+  int pass = 0;         //Control de tiempo maximo para la conexión wifi
+  
+  while ((WiFi.status() != WL_CONNECTED) and (pass != 30))
   {
     delay(500);
     Serial.print(".");
+    pass++;
+    
   }
   Serial.println("");
   Serial.println("WiFi conectado");
