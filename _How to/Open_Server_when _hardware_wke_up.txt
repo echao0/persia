@@ -1,0 +1,25 @@
+Best and easy way to turn on the server automatically it's using crontab.
+
+Please follow the next steps:
+
+1.Open a terminal
+
+2.command: 
+	sudo crontab -e
+		if it's the firts time that you use crontab, the program will aks you 
+		about the editor to use. I allways choose nano (i thing it's easier than the others)
+
+3. add next lines at the end:
+
+	#------------------Persia Server --------------------------
+	0,5,10,15,20,25,30,35,40,45,50,55 * * * * YOUR FOLDER LOCATION/server_python/core_launcher.sh
+	#----------------------------------------------------------
+
+4. Save and close
+	ctrl+x
+	y
+
+Now the system will check every 5 minutes if the core server of persia it's working and if it's not working the system will open it automatically. 
+
+:)
+

@@ -1,0 +1,16 @@
+To made the webpage as default in port 80 using linux, follow the next steps:
+
+UBUNTU:
+1.Open a terminal
+2.Configure file 000-default.cof
+	2.1 sudo nano /etc/apache2/sites-enabled/000-default.conf
+	2.2 find the line:  DocumentRoot /var/www/html
+	2.3 Change the line to: DocumentRoot /var/www/html/persia
+3.Close and save
+	3.1 crtl+x
+	3.2 y
+
+Now to webpage access only put in your browser the ip adrress of the server
+
+:)
+		
