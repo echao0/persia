@@ -1,28 +1,30 @@
 #!/usr/bin/env python
 
-#application: [CONTROL DE ARDUINO TEMP]
-#version: 5.1
+#application: [Persia_core]
+#version: 
 #runtime: python
 #api_version: 2.7
-#autor: _echao_
+#autor: echao0
 #
+#---Thanks to all the people that share all his knowledge, because they made this things possible!!!
+# -------------be curious, be open source, be maker, be open mind and be free!!!
 #
-# Anadido -v para modo vervose
+# 
 #
-#V2   Insertar con fecha a la que se ha producido el max y el min y parcial del dia
-#V3   Incorpora el control de arduino alive, actualiza el estado en la DB Temperatura.Dispositivos
-#V4	  Corrige el error al introducir la temperatura media, no introducia fecha (linea 127)
-#	  Corrige el error al introducir el status del dispositivo, no introducia fecha (linea 179, 187)
-#	  Anado funcion date_time(), que devuelve la fecha actual (null) o la de ayer (1)
-#	  Anado la ip del dispositivo cuando actualizo en DB el estado ONLINE - OFFLINE
-#V5	  Creo funcion get_insert_temp(): para recoger e insertar la informacion de la temperatura cuando el dispositivo esta ONLINE
-#	  Solo actualizo la temperatura en DB.Parciales si arduino esta ONLINE			  
+#Use -v to modo vervose			  
 
-#-----------------------Cambiar el nombre del proceso por defecto a persia
+#------- SQL confuguration ---------#
+DB_HOST = 'localhost' 
+DB_USER = 'persia' 
+DB_PASS = '/Persia/' 
+DB_NAME = 'persia'
+
+datos_sql = [DB_HOST, DB_USER, DB_PASS, DB_NAME]	#Array de tados SQL
+
+#-----------------------Change process name to persia-------------------
 import ctypes
 libc = ctypes.cdll.LoadLibrary('libc.so.6')
 libc.prctl(15, 'persia', 0, 0, 0)
-
 #-----------------------------------------------------------------------
                 
 from socket import *
@@ -31,8 +33,8 @@ import socket
 
 from decimal import Decimal
 import time 									# Se importa para poder leer la hora
-import os 										# Se importa para poder borrar pantalla de linux
-import sys 										# Se importa para poder pasar paremetros en la llamada
+import os 									# Se importa para poder borrar pantalla de linux
+import sys 									# Se importa para poder pasar paremetros en la llamada
 import MySQLdb 									# Server Connection to MySQL
 import datetime									# Para poder consrguir la fecha de ayer
 import threading								# Para poder realizar varios Hilos
@@ -55,24 +57,15 @@ disp1_move = 0
 disp2_move = 0
 disp3_move = 0
 
-port = 5000											#Puerto de comunicacion con Arduino
+port = 5000		#Arduino default comunication port
 
-outTimer = False                                                                                      #variable para saber que se tiene que ejecutar el beat de control
+outTimer = False        #variable para saber que se tiene que ejecutar el beat de control
 
 #------- Configuracion IP Servidor Python ---------- #
 server_host= '127.0.0.1'
-server_port=int(2000)								#Puerto del servidor
-server_on = True									#Variable de control de flujo
-working = False                                                                   #variable para control pila de salida ardu_out
-
-#------- Configuracion SQL ---------#
-
-DB_HOST = 'localhost' 
-DB_USER = 'persia' 
-DB_PASS = '/Persia/' 
-DB_NAME = 'persia'
-
-datos_sql = [DB_HOST, DB_USER, DB_PASS, DB_NAME]	#Array de tados SQL
+server_port=int(2000)			#Server socket to comunicate to webpage
+server_on = True			#Variable de control de flujo
+working = False                         #variable para control pila de salida ardu_out
 
 #------- Configuracion de tiempo -------#
 
