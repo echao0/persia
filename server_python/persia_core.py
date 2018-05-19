@@ -40,7 +40,9 @@ import datetime									# Para poder consrguir la fecha de ayer
 import threading								# Para poder realizar varios Hilos
 
 import argparse                                                                 #biblioteca para argumentos
- 
+
+devicer_name = "device_"
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
 python_args = parser.parse_args()
@@ -59,8 +61,6 @@ disp3_move = 0
 
 port = 5000		#Arduino default comunication port
 
-outTimer = False        #variable para saber que se tiene que ejecutar el beat de control
-
 #------- Configuracion IP Servidor Python ---------- #
 server_host= '127.0.0.1'
 server_port=int(2000)			#Server socket to comunicate to webpage
@@ -71,7 +71,7 @@ working = False                         #variable para control pila de salida ar
 
 time_triger = 10									#Tiempo en minutos
 sleep_time = 0.7 									#Tiempo en segundos de espera por cada bucle de programa (control de CPU)
-time_alive = 30										#Tiempo para latido de vida de Arduino
+time_alive = 31										#Tiempo para latido de vida de Arduino
 
 #------- Adecuar el valor de minutos a segundos
 
@@ -94,7 +94,8 @@ class timer():
     disp= False                         #Variable que indica que ip tiene el dispositivo a controlar
     beat=False                          #Saber si es timer para latido de vida de dispositivo
     beatWtime = False                   #variable de recarga de latido
-    
+    trigger = False                     #variable trigger para timer.
+
     global python_args
     
     
@@ -129,7 +130,7 @@ class timer():
             self.i=5000
             
     def timer_start(self):
-        global outTimer                                                          #variable global para saber cuando el temporizador de latido esta listo
+
         self.status = "working"
         
         if self.beat == True:self.beatWtime = self.wtime                        #Si el contador es de latido / bucle guardo el tiempo definido para el reinicio
@@ -152,13 +153,19 @@ class timer():
         self.status = False
         
         if self.beat == True:
-                    outTimer=True                                         #colocar variable global a 1 para ejecutar programa de latido / beat / bucle
+                    self.trigger=True                                         #colocar variable global a 1 para ejecutar programa de latido / beat / bucle
                     self.wtime = self.beatWtime                                 #Vuelvo a colocar el tiempo de espera para Latido / bucle
                     self.start()                                              #Reinicio el contador en caso que sea de Latido
-    
+
+    def get_trigger(self):                                                          #Getter de variable de latido
+        return self.trigger
+
+    def set_trigger(self,x):                                                          #setter de variable de latido
+        self.trigger = x
+
     def timer_start_short(self):
         
-        global outTimer                                                          #variable global para saber cuando el temporizador de latido esta listo
+        global trigger                                                          #variable global para saber cuando el temporizador de latido esta listo
         self.status = "working"
         
         if self.beat == True:self.beatWtime = self.wtime                        #Si el contador es de latido / bucle guardo el tiempo definido para el reinicio
@@ -181,7 +188,7 @@ class timer():
         self.status = False
         
         if self.beat == True:
-                    outTimer=True                                         #colocar variable global a 1 para ejecutar programa de latido / beat / bucle
+                    trigger=True                                         #colocar variable global a 1 para ejecutar programa de latido / beat / bucle
                     self.wtime = self.beatWtime                                 #Vuelvo a colocar el tiempo de espera para Latido / bucle
                     self.start()                                              #Reinicio el contador en caso que sea de Latido
                     
@@ -191,9 +198,8 @@ class timer():
             print "siempre"
             funtion
             time.sleep(self.wtime)
-            
-        
-        
+
+#------------------Dispositivos-------------------------
 def ip_dispositivos():
     
     global ip_disp1
@@ -219,9 +225,169 @@ def time_move():
     disp1_move = result[1]
     disp2_move = result[2]
     disp3_move = result[3]
-    
-    
-        
+
+def ardu_output(data, disp):
+    # ----------------------------------------------
+    # ----evitar lanzar dos paquetes a la vez
+    #    global working
+    #
+    #    while working == True:
+    #        print "espero"
+    #        pass
+    #
+    #    working = False
+    # ----------------------------------------------
+
+    try:
+        working = True
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+        client.settimeout(15);
+        client.connect((disp, 5000));
+        time.sleep(0.11);
+        client.send(data);
+
+        while 1:
+            resp = client.recv(1024)
+            if not resp:
+                break
+            if python_args.verbose:
+                print "Le envio: " + data + " a dispositivo " + disp + " y me ha devuelto: " + resp;
+            break
+        client.close()
+        return resp
+
+    except socket.timeout:
+        # if python_args.verbose:
+        #  print "timed out when connecting to " + disp
+        client.close()
+        client = None
+        return 0
+
+
+    except socket.error:
+        # if python_args.verbose:
+        #   print "error when communicating with " + disp
+        client.close()
+        client = None
+        return 0
+
+def update():
+    ip_dispositivos()
+    time_move()
+
+    timer1.disp = ip_disp1
+    timer2.disp = ip_disp2
+    timer3.disp = ip_disp3
+
+    timer1.wtime = disp1_move
+    timer2.wtime = disp2_move
+    timer3.wtime = disp3_move
+    if python_args.verbose:
+        print "Se han actualizado los valores de los dispositivos."
+
+def latido(ip_disp, status, id_disp):
+    if python_args.verbose:
+        print "Latido hacia:" + ip_disp
+
+    if (ardu_output("p", ip_disp) != 0):  # Mandar p a Arduino y nos responde con su id
+
+        if status == "offline":  # escribo la entrada en SQL solo si estaba offline
+
+            sql = "UPDATE `dispositivos` SET `status`= 'ONLINE' , `ip` = '" + ip_disp + "' , `Time` = '" + date_time() + "' WHERE `id` = '" + id_disp + "'"
+            db_conexion(sql)
+            status = "online"
+            return status
+    #            if get_insert_temp(time_starting_point):			#Llamo a funcion de introducir DB.parciales y actualizo hora de entrada para siguiente control
+    #            time_starting_point = time.time()
+
+    else:  # Si no hay respuesta salta el error y sabemos que esta en offline
+
+        if status == "online":  # Escribo la entrada en SQL solo si estaba online
+
+            sql = "UPDATE `dispositivos` SET `status`= 'OFFLINE' , `ip` = '" + ip_disp + "' , `Time` = '" + date_time() + "' WHERE `id` = '" + id_disp + "'"
+            db_conexion(sql)
+            status = "offline"
+            return status
+
+    return status
+
+class device():
+
+    def __init__(self, name,ip,wtime,id,status = "offline", infi = False):
+        self.name = name
+        self.ip = ip
+        self.wtime = wtime
+        self.infi = infi                #never stop automatically
+        self.id = id
+        self.status = status            #It's online or offline
+
+        if python_args.verbose:
+            print "id------------ : " + self.id
+            print "Decive created : " + self.name
+            print "ip asociada--- : " + self.ip
+            print "tiempo-------- : " + self.wtime
+            if self.infi:
+                print "-es infinito-"
+            print ""
+
+        def get_id():
+            return self.id
+        def get_ip():
+            return self.ip
+        def get_status():
+            return self.status
+        def get_wtime():
+            return self.wtime
+
+        def set_ip(new_ip):
+            self.ip = new_ip
+        def set_wtime(new_wtime):
+            self.wtime = new_wtime
+        def set_status(new_status):
+            self.status = new_status
+        def set_id(new_id):
+            self.id = new_id
+
+    #------Gemeral functions --------------------------------------
+
+        def ardu_output(self, data):
+
+            try:
+                working = True
+                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+                client.settimeout(15);
+                client.connect((self.ip, 5000));
+                time.sleep(0.11);
+                client.send(data);
+
+                while 1:
+                    resp = client.recv(1024)
+                    if not resp:
+                        break
+                    if python_args.verbose:
+                        print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+                    break
+                client.close()
+                return resp
+
+            except socket.timeout:
+                # if python_args.verbose:
+                #  print "timed out when connecting to " + disp
+                client.close()
+                client = None
+                return 0
+
+
+            except socket.error:
+                # if python_args.verbose:
+                #   print "error when communicating with " + disp
+                client.close()
+                client = None
+                return 0
+
+
+
+
 class ServerHandler (SocketServer.BaseRequestHandler):
 	global python_args
         
@@ -292,7 +458,7 @@ class ServerHandler (SocketServer.BaseRequestHandler):
                                 print "Reseteando el programa"
                                 self.request.send(str("Reiniciando"))
 				#restart_program();
-		
+
 class miserver():
 	global server_on
 	global python_args
@@ -337,9 +503,6 @@ class miserver():
                 
 	 
 #------- Declaracion de funciones --#
-#-----------------------------------#
-
-
 
 def db_conexion(sql):						#Funcion para insertar/ rescatar datos en SQL
 
@@ -355,23 +518,32 @@ def db_conexion(sql):						#Funcion para insertar/ rescatar datos en SQL
     
 	fields=cursor.fetchall()				#Particionar el resultado de la consulta
 	result = []								#Crear el array que devuelve la funcion
-	
+
 	for field in fields:
 		result.append(field[0])				#Guardar todos los datos particionados en el array
 
 	return result							#Fin de la funcion y retorno de los datos
 
-						
-def date_time_old(method='0'):					#funcion que devuelve fechas, por defecto la actual . 1 = la fecha de ayer
-	
-	if method == '1':
-	
-		yesterday = datetime.date.today () - datetime.timedelta (days=1)
-		return yesterday.strftime ("%Y-%m-%d %H:%M:%S")
-		
-	else :
-	
-		return time.strftime('%Y-%m-%d %H:%M:%S')
+def db_conexion_total(sql):  # Funcion para insertar/ rescatar datos en SQL
+
+    if python_args.verbose:  # Mostrar la consulta si esta en modo vervose
+        print sql
+
+    db = MySQLdb.connect(*datos_sql)  # Ejecutar la consulta de SQL
+    cursor = db.cursor()
+    cursor.execute(sql)
+    db.commit()
+    db.close()
+
+    fields = cursor.fetchall()  # Particionar el resultado de la consulta
+    result = []  # Crear el array que devuelve la funcion
+
+    for field in fields:
+       result.append(field[0])  # Guardar todos los datos particionados en el array
+       result.append(field[1])
+       result.append(field[2])
+
+    return result  # Fin de la funcion y retorno de los datos
 
 def date_time(method='0'):					#funcion que devuelve fechas, por defecto la actual . 1 = la fecha de ayer
 	
@@ -387,95 +559,6 @@ def date_time(method='0'):					#funcion que devuelve fechas, por defecto la actu
          
         if method == '3':
                 return time.strftime('%a')
-            
-	
-        
-def ardu_output(data,disp):
-   #----------------------------------------------
-   #----evitar lanzar dos paquetes a la vez
-#    global working
-#         
-#    while working == True:
-#        print "espero"
-#        pass
-#    
-#    working = False
-   #----------------------------------------------
-   
-    try:
-        working = True
-        client=socket.socket(socket.AF_INET,socket.SOCK_STREAM);
-        client.settimeout(15);
-        client.connect((disp,5000));
-        time.sleep(0.11);
-        client.send(data);
-        
-        while 1:
-            resp = client.recv(1024)
-            if not resp: 
-                break
-            if python_args.verbose:
-                print "Le envio: "+data+" a dispositivo "+disp+" y me ha devuelto: " + resp;
-            break    
-        client.close()
-        return resp
-    
-    except socket.timeout:
-       # if python_args.verbose:
-          #  print "timed out when connecting to " + disp
-        client.close()
-        client = None
-        return 0
-        
-
-    except socket.error:
-       # if python_args.verbose:
-         #   print "error when communicating with " + disp
-        client.close()
-        client = None
-        return 0
-                
-def update():
-    
-    ip_dispositivos()
-    time_move()
-    
-    timer1.disp = ip_disp1
-    timer2.disp = ip_disp2
-    timer3.disp = ip_disp3
-    
-    timer1.wtime = disp1_move
-    timer2.wtime = disp2_move
-    timer3.wtime = disp3_move
-    if python_args.verbose:
-        print "Se han actualizado los valores de los dispositivos."
-    
-def latido(ip_disp, status, id_disp):
-    
-    if python_args.verbose:
-        print "Latido hacia:" +  ip_disp
-    
-    if (ardu_output("p",ip_disp) != 0 ):                                    #Mandar p a Arduino y nos responde con su id
-        
-	if status == "offline":                                              #escribo la entrada en SQL solo si estaba offline
-				
-            sql = "UPDATE `dispositivos` SET `status`= 'ONLINE' , `ip` = '"+ ip_disp +"' , `Time` = '" + date_time() + "' WHERE `id` = '"+ id_disp +"'"
-            db_conexion(sql)
-            status = "online"
-            return  status
-#            if get_insert_temp(time_starting_point):			#Llamo a funcion de introducir DB.parciales y actualizo hora de entrada para siguiente control
-#            time_starting_point = time.time()
-				
-    else:													#Si no hay respuesta salta el error y sabemos que esta en offline
-				
-        if status == "online":								#Escribo la entrada en SQL solo si estaba online
-																	
-            sql = "UPDATE `dispositivos` SET `status`= 'OFFLINE' , `ip` = '"+ ip_disp +"' , `Time` = '" + date_time() + "' WHERE `id` = '"+ id_disp +"'"
-            db_conexion(sql)
-            status = "offline" 
-            return  status
-    
-    return status
 
 def timer_auto():
                                                  #Sirve par recoger de la base de datos las acciones automaticas programadas 
@@ -574,7 +657,6 @@ def restart_program():
 #----------------------------------------------------#
 
 
-
 time_starting_point = time.time()                                                       #Tomar el tiempo de inicio de ejecucion de programa para triger
 time_starting_point_alive = time.time()							#Tomar el tiempo de inicio de ejecucion de programa para triger de alive
 
@@ -592,7 +674,7 @@ time_move()
 client_socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM);
 #client_socket = socket(socket.AF_INET,socket.SOCK_STREAM)
 client_socket.settimeout(1) 						#Only wait 1 second for a response
-address = (ip_disp1 , port)						#define arduino IP and port
+address = (ip_disp1 , port)						    #define arduino IP and port
 
 
 
@@ -604,6 +686,8 @@ titulo = '\033[1;34m Servidor Control Persianas \033[1;m'
 print titulo.center(50, " ")
 titulo = "-"
 print titulo.center(50, "-")
+
+#--------------Declaracion de timers para las persianas-------------------------
 
 timer1=timer()
 timer1.name="Timer1"
@@ -619,30 +703,63 @@ timer3=timer()
 timer3.name="Timer3"
 timer3.wtime = disp3_move
 timer3.disp = ip_disp3
+#--------------------------------------------------------------------------------
 
+#-----------------Cilcos infinitos para control de latidos y alarmas-------------
 timerLatido=timer()
 timerLatido.name="latido"
 timerLatido.wtime = time_alive
-timerLatido.beat = True  #Estaba en True Activacion del latido
+timerLatido.beat = True                      #Activa timer ciclico
 timerLatido.start()
+
+timerAutomove=timer()
+timerAutomove.name="automove"
+timerAutomove.wtime = 60
+timerAutomove.beat = True                   #Activa timer ciclico
+timerAutomove.start()
+#----------------------------------------------------------------------------------
+
 
  													#Borrado de pantalla
 servidor1 = miserver()                                                                                                  #Declaro que quiero un servidor
 servidor1.start()													#Inicio el servidor
 
-lanza = 0
- 
+
+
+#----------------------------Test de dispositivos multiples------------------
+#----------------------------Seleccionar devices de la DB y crear el device
+
+sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
+
+result = db_conexion_total(sql)
+
+x = 0
+
+for i in range(len(result)):
+    try:
+        if x == 3:
+            devicer_name_com = devicer_name + str(result[i])
+            devicer_name_com = device(devicer_name_com, str(result[i+1]),str(result[i+2]),str(result[i]))
+            devicer_name_com = ''
+            x = 0
+        x = x + 1
+
+    except:
+        print "no puedo"
+#----------------------------------------------------------------------------
+
 try:										
 	while(1):
                 #[[3, 1, 1, 0, 0, 1, 1, 1, 's', '07:50']]
-                
-                if (lanza ==65):                        
-                        var1= timer_auto()
-                        timer_auto_lanza(var1)
-                        lanza = 0
-                lanza = lanza + 1
-            
-                if outTimer == True:
+
+
+                if timerAutomove.get_trigger() == True:
+                    var1 = timer_auto()                     # control de timers programados para movimiento automatico. Esto devuelve la matriz con lo necesario.
+                    timer_auto_lanza(var1)
+                    timerAutomove.set_trigger(False)
+
+
+                if timerLatido.get_trigger() == True:
                     
                     if python_args.verbose:
                         print "----------------"
@@ -656,7 +773,7 @@ try:
                     if python_args.verbose:
                         print "----------------"
                         
-                    outTimer = False
+                    timerLatido.set_trigger(False)
                 time.sleep(sleep_time)
 		
 except KeyboardInterrupt:
