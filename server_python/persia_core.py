@@ -42,7 +42,8 @@ import threading  # Para poder realizar varios Hilos
 
 import argparse  # biblioteca para argumentos
 
-devicer_name = "device_"
+#devicer_name = "device_"
+disp = {}                 #Dic to storage objects to access using ID
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
@@ -72,7 +73,7 @@ working = False  # variable para control pila de salida ardu_out
 
 time_triger = 10  # Tiempo en minutos
 sleep_time = 0.7  # Tiempo en segundos de espera por cada bucle de programa (control de CPU)
-time_alive = 31  # Tiempo para latido de vida de Arduino
+time_alive = 5  # Tiempo para latido de vida de Arduino
 
 # ------- Adecuar el valor de minutos a segundos
 
@@ -212,7 +213,6 @@ def ip_dispositivos():
     ip_disp2 = result[2]
     ip_disp3 = result[3]
 
-
 def time_move():
     global disp1_move
     global disp2_move
@@ -224,7 +224,6 @@ def time_move():
     disp1_move = result[1]
     disp2_move = result[2]
     disp3_move = result[3]
-
 
 def ardu_output(data, disp):
     # ----------------------------------------------
@@ -271,7 +270,6 @@ def ardu_output(data, disp):
         client = None
         return 0
 
-
 def update():
     ip_dispositivos()
     time_move()
@@ -317,13 +315,13 @@ def latido(ip_disp, status, id_disp):
 class device():
     instances = []
 
-    def __init__(self, name, ip, wtime, id, status="offline", infi=False):
+    def __init__(self, name, ip, wtime, id, infi=False):
         self.name = name
         self.ip = ip
         self.wtime = wtime
         self.infi = infi  # never stop automatically
         self.id = id
-        self.status = status  # It's online or offline
+        self.status = "offline"  # It's online or offline
 
         if python_args.verbose:
             print "id------------ : " + self.id
@@ -363,42 +361,67 @@ class device():
 
         # ------Gemeral functions --------------------------------------
 
-        def comm(self, data):
+    def comm(self, data):
 
-            try:
-                working = True
-                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-                client.settimeout(15);
-                client.connect((self.ip, 5000));
-                time.sleep(0.11);
-                client.send(data);
+        try:
+            working = True
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            client.settimeout(15);
+            client.connect((self.ip, 5000));
+            time.sleep(0.11);
+            client.send(data);
 
-                while 1:
-                    resp = client.recv(1024)
-                    if not resp:
-                        break
-                    if python_args.verbose:
-                        print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+            while 1:
+                resp = client.recv(1024)
+                if not resp:
                     break
-                client.close()
-                return resp
+                if python_args.verbose:
+                    print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+                break
+            client.close()
+            return resp
 
-            except socket.timeout:
-                # if python_args.verbose:
-                #  print "timed out when connecting to " + disp
-                client.close()
-                client = None
-                print "no ha sido posible madar el paquete."
-                return 0
+        except socket.timeout:
+            # if python_args.verbose:
+            #  print "timed out when connecting to " + disp
+            client.close()
+            client = None
+            print "no ha sido posible madar el paquete."
+            return 0
 
 
-            except socket.error:
-                # if python_args.verbose:
-                #   print "error when communicating with " + disp
-                client.close()
-                client = None
-                return 0
+        except socket.error:
+            # if python_args.verbose:
+            #   print "error when communicating with " + disp
+            client.close()
+            client = None
+            return 0
 
+    def latido(self):
+        if python_args.verbose:
+            print "Latido hacia:" + self.ip
+
+        if (self.comm("p") != 0):  # Mandar p a Arduino y nos responde con su id
+
+            if self.status == "offline":  # escribo la entrada en SQL solo si estaba offline
+
+                sql = "UPDATE `dispositivos` SET `status`= 'ONLINE' , `ip` = '" + self.ip + "' , `Time` = '" + date_time() + "' WHERE `id` = '" + self.id + "'"
+                db_conexion(sql)
+                self.status = "online"
+                return self.status
+        #            if get_insert_temp(time_starting_point):			#Llamo a funcion de introducir DB.parciales y actualizo hora de entrada para siguiente control
+        #            time_starting_point = time.time()
+
+        else:  # Si no hay respuesta salta el error y sabemos que esta en offline
+
+            if self.status == "online":  # Escribo la entrada en SQL solo si estaba online
+
+                sql = "UPDATE `dispositivos` SET `status`= 'OFFLINE' , `ip` = '" + self.ip + "' , `Time` = '" + date_time() + "' WHERE `id` = '" + self.id + "'"
+                db_conexion(sql)
+                self.status = "offline"
+                return self.status
+
+        return self.status
 
 class ServerHandler(SocketServer.BaseRequestHandler):
     global python_args
@@ -749,67 +772,30 @@ result = db_conexion_total(sql)
 
 x = 0
 
-devicet = []
-
+#devicet = []
+#----------------Anadir los dispositivos a diccionario.--------------------------------
 
 for i in range(len(result)):
     try:
         if x == 3:
-            # devicer_name_com = devicer_name + str(result[i])
-            # devicer_name_com = str(result[i])
-            # devicer_name_com = device(devicer_name_com, str(result[i+1]),str(result[i+2]),str(result[i]))
-            # devicer_name_com = ''
-            # devicet.append(device("actuador_"+str(result[i]), str(result[i+1]),str(result[i+2]),str(result[i])))
-            devicet.append([result[i], device("actuador_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),
-                                              str(result[i]))])
+            #devicet.append([result[i], device("actuador_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))])
+            disp[str(result[i])] = device("disp_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))
             x = 0
         x = x + 1
 
     except:
-        print "It's not possible to create devices" % 1
+        print "It's not possible to create devices"
 
 
-#----------------Añadir los dispositivos a diccionario.--------------------------------
-actuador = {}                 #Diccionario para poder utilizar los objetos por el numero de id
+#i = 0;
+#for element in devicet:
+#    print "numero de lista: " + str(i) + " numero de actuador: " + str(element[0])
+#    print element
+#    actuador[str(element[0])]= devicet[i][1]             #sirve para anadir al diccionario los devices y buscarlos por el numero de ip
+#    i = i + 1
 
-i = 0;
-for element in devicet:
-    print "numero de lista: " + str(i) + " numero de actuador: " + str(element[0])
-    print element
-    actuador[str(element[0])]= devicet[i][1]             #sirve para anadir al diccionario los devices y buscarlos por el numero de ip
-    i = i + 1
-
-print actuador["1"].get_ip()
-print actuador["2"].get_ip()
-print actuador["3"].get_ip()
 
 #---------------------------------------------------------------------------------------
-
-
-def imprimir(lista, valor):
-    for elemento in lista:
-        if isinstance(elemento, list):
-            imprimir(elemento,valor)
-        else:
-            print(elemento)
-            if (elemento == valor):
-                print "encontrado"
-
-imprimir(devicet,3)
-
-#Buscar dentro de la lista el elemento derminado.
-
-def indices(lista, elm):
-  for fila in lista:
-    if elm in fila:
-      return ( lista.index(fila) ,  fila.index(elm) )
-  return (None, None)
-
-print indices(devicet, 3)
-
-
-
-# ----------------------------------------------------------------------------
 
 try:
     while (1):
@@ -827,9 +813,13 @@ try:
                 print "Lanzo latidos"
                 print "----------------"
 
-            status_id1 = latido(ip_disp1, status_id1, "1")
-            status_id2 = latido(ip_disp2, status_id2, "2")
-            status_id3 = latido(ip_disp3, status_id3, "3")
+            for key, value in disp.iteritems():
+                print key
+                disp[str(key)].latido()
+
+            #status_id1 = latido(ip_disp1, status_id1, "1")
+            #status_id2 = latido(ip_disp2, status_id2, "2")
+            #status_id3 = latido(ip_disp3, status_id3, "3")
 
             if python_args.verbose:
                 print "----------------"
@@ -841,5 +831,6 @@ except KeyboardInterrupt:
     if python_args.verbose:
         print "Detectado el cierre del hilo principal"
         print "Matando hilos secundarios"
+    disp = ""
     server_on = False
     os.system('sudo killall persia')
