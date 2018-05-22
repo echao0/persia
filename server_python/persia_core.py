@@ -44,6 +44,7 @@ import argparse  # biblioteca para argumentos
 
 #devicer_name = "device_"
 disp = {}                 #Dic to storage objects to access using ID
+timers = {}               #Dic to storage Timers to access using ID
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
@@ -73,7 +74,7 @@ working = False  # variable para control pila de salida ardu_out
 
 time_triger = 10  # Tiempo en minutos
 sleep_time = 0.7  # Tiempo en segundos de espera por cada bucle de programa (control de CPU)
-time_alive = 5  # Tiempo para latido de vida de Arduino
+time_alive = 31  # Tiempo para latido de vida de Arduino
 
 # ------- Adecuar el valor de minutos a segundos
 
@@ -346,6 +347,9 @@ class device():
 
     def get_wtime(self):
         return self.wtime
+
+    def get_infi(self):
+        return self.infi
 
     def set_ip(self, new_ip):
         self.ip = new_ip
@@ -770,11 +774,9 @@ sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
 
 result = db_conexion_total(sql)
 
-x = 0
-
 #devicet = []
 #----------------Anadir los dispositivos a diccionario.--------------------------------
-
+x = 0
 for i in range(len(result)):
     try:
         if x == 3:
@@ -787,6 +789,21 @@ for i in range(len(result)):
         print "It's not possible to create devices"
 
 
+#-----Crear los timers de los elementos que se han creado y que no sean infinitos
+
+for key, value in disp.iteritems() :    #Get all dispositives ID
+    if not disp[key].get_infi():        #the dispositive it's not infinite need a timer
+
+        timers[str(key)] = timer()
+        timers[str(key)].name = str(key)
+        timers[str(key)].wtime = disp[str(key)].get_wtime
+        timers[str(key)].disp = disp[str(key)].get_ip
+
+#for key, value in timers.iteritems() :
+#    print key
+#    print value
+
+#---------------------------------------------------------------------------------------------
 #i = 0;
 #for element in devicet:
 #    print "numero de lista: " + str(i) + " numero de actuador: " + str(element[0])
