@@ -72,22 +72,13 @@ working = False  # variable para control pila de salida ardu_out
 
 # ------- Configuracion de tiempo -------#
 
-time_triger = 10  # Tiempo en minutos
 sleep_time = 0.7  # Tiempo en segundos de espera por cada bucle de programa (control de CPU)
 time_alive = 31  # Tiempo para latido de vida de Arduino
-
-# ------- Adecuar el valor de minutos a segundos
-
-time_triger = time_triger * 60
-
-status_id1 = "offline"  # variable para saber estado de dispositivo actual (se evita la reescritura en SQL)
-status_id2 = "offline"
-status_id3 = "offline"
 
 
 # ------- Declaracion de Classes ----#
 # -----------------------------------#
-class timer():
+class Timer():
     # cada vez que se manda el start, se reinicia el contador.
 
     status = False  # Variable para saber si hay que iniciar o reiniciar el temorizador
@@ -200,6 +191,14 @@ class timer():
             funtion
             time.sleep(self.wtime)
 
+    def get_name(self):
+        return self.name
+
+    def get_wtime(self):
+        return self.wtime
+
+    def get_disp(self):
+        return self.disp
 
 # ------------------Dispositivos-------------------------
 def ip_dispositivos():
@@ -285,36 +284,7 @@ def update():
     if python_args.verbose:
         print "Se han actualizado los valores de los dispositivos."
 
-
-def latido(ip_disp, status, id_disp):
-    if python_args.verbose:
-        print "Latido hacia:" + ip_disp
-
-    if (ardu_output("p", ip_disp) != 0):  # Mandar p a Arduino y nos responde con su id
-
-        if status == "offline":  # escribo la entrada en SQL solo si estaba offline
-
-            sql = "UPDATE `dispositivos` SET `status`= 'ONLINE' , `ip` = '" + ip_disp + "' , `Time` = '" + date_time() + "' WHERE `id` = '" + id_disp + "'"
-            db_conexion(sql)
-            status = "online"
-            return status
-    #            if get_insert_temp(time_starting_point):			#Llamo a funcion de introducir DB.parciales y actualizo hora de entrada para siguiente control
-    #            time_starting_point = time.time()
-
-    else:  # Si no hay respuesta salta el error y sabemos que esta en offline
-
-        if status == "online":  # Escribo la entrada en SQL solo si estaba online
-
-            sql = "UPDATE `dispositivos` SET `status`= 'OFFLINE' , `ip` = '" + ip_disp + "' , `Time` = '" + date_time() + "' WHERE `id` = '" + id_disp + "'"
-            db_conexion(sql)
-            status = "offline"
-            return status
-
-    return status
-
-
-class device():
-    instances = []
+class Device():
 
     def __init__(self, name, ip, wtime, id, infi=False):
         self.name = name
@@ -335,6 +305,9 @@ class device():
 
     def __del__(self):
         print "El objeto: " + self.name + " a sido destruido"
+
+    def get_name(self):
+        return self.name
 
     def get_id(self):
         return self.id
@@ -428,29 +401,7 @@ class device():
         return self.status
 
 class ServerHandler(SocketServer.BaseRequestHandler):
-    global python_args
-
-    def selec(self, data):
-
-        if (data == "1"):
-            if python_args.verbose:
-                print "Timer1 iniciado"
-            timer1.start()
-
-        if (data == "2"):
-            if python_args.verbose:
-                print "Timer2 iniciado"
-            timer2.start()
-
-        if (data == "3"):
-            if python_args.verbose:
-                print "Timer3 iniciado"
-            timer3.start()
-
     def handle(self):
-        global ip_disp1
-        global ip_disp2
-        global ip_disp3
 
         self.data = self.request.recv(1024).strip()
 
@@ -461,40 +412,27 @@ class ServerHandler(SocketServer.BaseRequestHandler):
             datos = self.data.split(",")  # separo la cadena y formo una lista datos[1] = persiana datos[0] = accion
 
             if python_args.verbose:
-                print "Persiana: ", datos[1]
-                print "Accion: ", datos[0]
-
-            if datos[1] == "1":
-                disp = ip_disp1
-            if datos[1] == "2":
-                disp = ip_disp2
-            if datos[1] == "3":
-                disp = ip_disp3
+                print "Persiana: "+ datos[1]
+                print "Accion: "+ datos[0]
 
             if datos[0] == "abajo":
                 self.request.send(str("Bajando"))
-                ardu_output("b", disp)
-                self.selec(datos[1])
+                disp[str(datos[1])].comm("b")
+                timers[str(datos[1])].start()
 
             if datos[0] == "Subir":
                 self.request.send(str("Subiendo"))
-                ardu_output("s", disp)
-                self.selec(datos[1])
+                disp[str(datos[1])].comm("s")
+                timers[str(datos[1])].start()
 
             if datos[0] == "stop":
                 self.request.send(str("Paro"))
-                ardu_output("z", disp)
-                self.selec(datos[1])
+                disp[str(datos[1])].comm("z")
+                timers[str(datos[1])].start()
 
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
                 update();
-
-            if datos[0] == "reset":
-                print "Reseteando el programa"
-                self.request.send(str("Reiniciando"))
-            # restart_program();
-
 
 class miserver():
     global server_on
@@ -730,58 +668,21 @@ print titulo.center(50, " ")
 titulo = "-"
 print titulo.center(50, "-")
 
-# --------------Declaracion de timers para las persianas-------------------------
-
-timer1 = timer()
-timer1.name = "Timer1"
-timer1.wtime = disp1_move
-timer1.disp = ip_disp1
-
-timer2 = timer()
-timer2.name = "Timer2"
-timer2.wtime = disp2_move
-timer2.disp = ip_disp2
-
-timer3 = timer()
-timer3.name = "Timer3"
-timer3.wtime = disp3_move
-timer3.disp = ip_disp3
-# --------------------------------------------------------------------------------
-
-# -----------------Cilcos infinitos para control de latidos y alarmas-------------
-timerLatido = timer()
-timerLatido.name = "latido"
-timerLatido.wtime = time_alive
-timerLatido.beat = True  # Activa timer ciclico
-timerLatido.start()
-
-timerAutomove = timer()
-timerAutomove.name = "automove"
-timerAutomove.wtime = 60
-timerAutomove.beat = True  # Activa timer ciclico
-timerAutomove.start()
-# ----------------------------------------------------------------------------------
+servidor1 = miserver()
+servidor1.start()                                   # Server start to recive packets
 
 
-# Borrado de pantalla
-servidor1 = miserver()  # Declaro que quiero un servidor
-servidor1.start()  # Inicio el servidor
-
-# ----------------------------Test de dispositivos multiples------------------
-# ----------------------------Seleccionar devices de la DB y crear el device
+# ----------Create diccionary with all devices from DB-------------------
 
 sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
 
 result = db_conexion_total(sql)
 
-#devicet = []
-#----------------Anadir los dispositivos a diccionario.--------------------------------
 x = 0
 for i in range(len(result)):
     try:
         if x == 3:
-            #devicet.append([result[i], device("actuador_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))])
-            disp[str(result[i])] = device("disp_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))
+            disp[str(result[i])] = Device("disp_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))
             x = 0
         x = x + 1
 
@@ -789,27 +690,31 @@ for i in range(len(result)):
         print "It's not possible to create devices"
 
 
-#-----Crear los timers de los elementos que se han creado y que no sean infinitos
+#-----Create the timers
 
 for key, value in disp.iteritems() :    #Get all dispositives ID
     if not disp[key].get_infi():        #the dispositive it's not infinite need a timer
 
-        timers[str(key)] = timer()
-        timers[str(key)].name = str(key)
-        timers[str(key)].wtime = disp[str(key)].get_wtime
-        timers[str(key)].disp = disp[str(key)].get_ip
+        timers[str(key)] = Timer()
+        timers[str(key)].name = str(disp[str(key)].get_name())
+        timers[str(key)].wtime = int(disp[str(key)].get_wtime())
+        timers[str(key)].disp = disp[str(key)].get_ip()
 
-#for key, value in timers.iteritems() :
-#    print key
-#    print value
+# -----------------Infinite timers for alarms and online pulse-------------
 
-#---------------------------------------------------------------------------------------------
-#i = 0;
-#for element in devicet:
-#    print "numero de lista: " + str(i) + " numero de actuador: " + str(element[0])
-#    print element
-#    actuador[str(element[0])]= devicet[i][1]             #sirve para anadir al diccionario los devices y buscarlos por el numero de ip
-#    i = i + 1
+timerLatido = Timer()
+timerLatido.name = "latido"
+timerLatido.wtime = time_alive
+timerLatido.beat = True  # Activate infinite counter
+timerLatido.start()
+
+timerAutomove = Timer()
+timerAutomove.name = "automove"
+timerAutomove.wtime = 60
+timerAutomove.beat = True  # Activate infinite counter
+timerAutomove.start()
+
+# ----------------------------------------------------------------------------------
 
 
 #---------------------------------------------------------------------------------------
@@ -833,10 +738,6 @@ try:
             for key, value in disp.iteritems():
                 print key
                 disp[str(key)].latido()
-
-            #status_id1 = latido(ip_disp1, status_id1, "1")
-            #status_id2 = latido(ip_disp2, status_id2, "2")
-            #status_id3 = latido(ip_disp3, status_id3, "3")
 
             if python_args.verbose:
                 print "----------------"
