@@ -23,7 +23,6 @@ datos_sql = [DB_HOST, DB_USER, DB_PASS, DB_NAME]  # Array de tados SQL
 
 # -----------------------Change process name to persia-------------------
 import ctypes
-
 libc = ctypes.cdll.LoadLibrary('libc.so.6')
 libc.prctl(15, 'persia', 0, 0, 0)
 # -----------------------------------------------------------------------
@@ -39,10 +38,8 @@ import sys  # Se importa para poder pasar paremetros en la llamada
 import MySQLdb  # Server Connection to MySQL
 import datetime  # Para poder consrguir la fecha de ayer
 import threading  # Para poder realizar varios Hilos
-
 import argparse  # biblioteca para argumentos
 
-#devicer_name = "device_"
 disp = {}                 #Dic to storage objects to access using ID
 timers = {}               #Dic to storage Timers to access using ID
 
@@ -50,17 +47,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
 python_args = parser.parse_args()
 
-# ------- Configuracion IP Arduino ---------- #
-# antes del inicio del programa llamo a la funcion ip_dispositivos  que consulta en SQL las ip
-# ip = '192.168.3.177'  #Direccion ip del arduino de momento se usa para update de estado<s
-
-ip_disp1 = 0
-ip_disp2 = 0
-ip_disp3 = 0
-
-disp1_move = 0
-disp2_move = 0
-disp3_move = 0
 
 port = 5000  # Arduino default comunication port
 
@@ -73,8 +59,7 @@ working = False  # variable para control pila de salida ardu_out
 # ------- Configuracion de tiempo -------#
 
 sleep_time = 0.7  # Tiempo en segundos de espera por cada bucle de programa (control de CPU)
-time_alive = 31  # Tiempo para latido de vida de Arduino
-
+time_alive = 35  # Tiempo para latido de vida de Arduino
 
 # ------- Declaracion de Classes ----#
 # -----------------------------------#
@@ -140,7 +125,7 @@ class Timer():
         if python_args.verbose:
             if self.beat == False: print self.name + " Finalizado tiempo esperando: " + str(self.wtime)
 
-        if self.beat == False: ardu_output("z", self.disp)  # Envio paro a arduino
+        if self.beat == False: disp[str(self.name)].comm("z")  # Envio paro a arduino
         # Reinicio las variables de control de tiempo
         self.i = 0
         self.status = False
@@ -174,7 +159,7 @@ class Timer():
         if python_args.verbose:
             if self.beat == False: print self.name + " Finalizado tiempo esperando: " + str(self.wtime)
 
-        if self.beat == False: ardu_output("z", self.disp)  # Envio paro a arduino
+        if self.beat == False: disp[str(self.name)].comm("z")  # Envio paro a arduino
         # Reinicio las variables de control de tiempo
         self.i = 0
         self.status = False
@@ -200,87 +185,9 @@ class Timer():
     def get_disp(self):
         return self.disp
 
-# ------------------Dispositivos-------------------------
-def ip_dispositivos():
-    global ip_disp1
-    global ip_disp2
-    global ip_disp3
-
-    sql = "SELECT `ip` FROM `dispositivos` order by `id` asc"
-    result = db_conexion(sql)
-    #    El dispositivo 0 es el servidor, por lo que no lo tengo en cuenta.
-    ip_disp1 = result[1]
-    ip_disp2 = result[2]
-    ip_disp3 = result[3]
-
-def time_move():
-    global disp1_move
-    global disp2_move
-    global disp3_move
-
-    sql = "SELECT `move` FROM `dispositivos` order by `id` asc"
-    result = db_conexion(sql)
-    #    El dispositivo 0 es el servidor, por lo que no lo tengo en cuenta.
-    disp1_move = result[1]
-    disp2_move = result[2]
-    disp3_move = result[3]
-
-def ardu_output(data, disp):
-    # ----------------------------------------------
-    # ----evitar lanzar dos paquetes a la vez
-    #    global working
-    #
-    #    while working == True:
-    #        print "espero"
-    #        pass
-    #
-    #    working = False
-    # ----------------------------------------------
-
-    try:
-        working = True
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-        client.settimeout(15);
-        client.connect((disp, 5000));
-        time.sleep(0.11);
-        client.send(data);
-
-        while 1:
-            resp = client.recv(1024)
-            if not resp:
-                break
-            if python_args.verbose:
-                print "Le envio: " + data + " a dispositivo " + disp + " y me ha devuelto: " + resp;
-            break
-        client.close()
-        return resp
-
-    except socket.timeout:
-        # if python_args.verbose:
-        #  print "timed out when connecting to " + disp
-        client.close()
-        client = None
-        return 0
-
-
-    except socket.error:
-        # if python_args.verbose:
-        #   print "error when communicating with " + disp
-        client.close()
-        client = None
-        return 0
-
 def update():
-    ip_dispositivos()
-    time_move()
+    pass
 
-    timer1.disp = ip_disp1
-    timer2.disp = ip_disp2
-    timer3.disp = ip_disp3
-
-    timer1.wtime = disp1_move
-    timer2.wtime = disp2_move
-    timer3.wtime = disp3_move
     if python_args.verbose:
         print "Se han actualizado los valores de los dispositivos."
 
@@ -386,8 +293,6 @@ class Device():
                 db_conexion(sql)
                 self.status = "online"
                 return self.status
-        #            if get_insert_temp(time_starting_point):			#Llamo a funcion de introducir DB.parciales y actualizo hora de entrada para siguiente control
-        #            time_starting_point = time.time()
 
         else:  # Si no hay respuesta salta el error y sabemos que esta en offline
 
@@ -399,6 +304,36 @@ class Device():
                 return self.status
 
         return self.status
+
+def devices_timers():
+    """What for?:
+       Recibe:
+       Return:"""
+
+    sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
+
+    result = db_conexion_total(sql)
+
+    x = 0
+    for i in range(len(result)):
+        try:
+            if x == 3:
+                disp[str(result[i])] = Device(str(result[i]), str(result[i + 1]), str(result[i + 2]), str(result[i]))
+                x = 0
+            x = x + 1
+
+        except:
+            print "It's not possible to create devices"
+
+    # -----Create the timers for devices
+
+    for key, value in disp.iteritems():  # Get all dispositives ID
+        if not disp[key].get_infi():  # the dispositive it's not infinite need a timer
+
+            timers[str(key)] = Timer()
+            timers[str(key)].name = str(disp[str(key)].get_name())
+            timers[str(key)].wtime = int(disp[str(key)].get_wtime())
+            timers[str(key)].disp = disp[str(key)].get_ip()
 
 class ServerHandler(SocketServer.BaseRequestHandler):
     def handle(self):
@@ -432,7 +367,7 @@ class ServerHandler(SocketServer.BaseRequestHandler):
 
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
-                update();
+                devices_timers();
 
 class miserver():
     global server_on
@@ -477,7 +412,6 @@ class miserver():
 
     # ------- Declaracion de funciones --#
 
-
 def db_conexion(sql):  # Funcion para insertar/ rescatar datos en SQL
 
     if python_args.verbose:  # Mostrar la consulta si esta en modo vervose
@@ -496,7 +430,6 @@ def db_conexion(sql):  # Funcion para insertar/ rescatar datos en SQL
         result.append(field[0])  # Guardar todos los datos particionados en el array
 
     return result  # Fin de la funcion y retorno de los datos
-
 
 def db_conexion_total(sql):  # Funcion para insertar/ rescatar datos en SQL
 
@@ -519,7 +452,6 @@ def db_conexion_total(sql):  # Funcion para insertar/ rescatar datos en SQL
 
     return result  # Fin de la funcion y retorno de los datos
 
-
 def date_time(method='0'):  # funcion que devuelve fechas, por defecto la actual . 1 = la fecha de ayer
 
     if method == '1':
@@ -534,7 +466,6 @@ def date_time(method='0'):  # funcion que devuelve fechas, por defecto la actual
 
     if method == '3':
         return time.strftime('%a')
-
 
 def timer_auto():
     # Sirve par recoger de la base de datos las acciones automaticas programadas
@@ -577,12 +508,10 @@ def timer_auto():
 
     return matriz
 
-
 def timer_auto_lanza(matriz):  # saber con la matriz de timer_auto() si es la hora de lanzar accion automatica
-
-    global ip_disp1
-    global ip_disp2
-    global ip_disp3
+    """What for?: This def send activation to the devices when the system time its specified in DB.temporiza
+       Recibe Matrix whit all lines from DB.temporiza where active = 1.
+       Return: Nothing, but activate the device output."""
 
     if python_args.verbose:
         print "hora actual: " + date_time('2');
@@ -599,50 +528,12 @@ def timer_auto_lanza(matriz):  # saber con la matriz de timer_auto() si es la ho
 
             if (matriz[i][9] == date_time('2')):
 
-                if matriz[i][0] == 3:
-                    ip_disp = ip_disp3;
-                    if matriz[i][10] == 0:
-                        timer3.start();
-                    else:
-                        timer3.start_short();  # Saber la ip del dispositivo
+                if matriz[i][10] == 0:
+                    timers[str(matriz[i][0])].start();      #Start timer of the device
+                else:
+                    timers[str(matriz[i][0])].start_short();  # Short movement?
 
-                if matriz[i][0] == 2:
-                    ip_disp = ip_disp2;
-                    if matriz[i][10] == 0:
-                        timer2.start();
-                    else:
-                        timer2.start_short();  # Saber la ip del dispositivo
-
-                if matriz[i][0] == 1:
-                    ip_disp = ip_disp1;
-                    if matriz[i][10] == 0:
-                        timer1.start();
-                    else:
-                        timer1.start_short();  # Saber la ip del dispositivo
-
-                if (matriz[i][8] == "s"):
-                    ardu_output("s", ip_disp)
-                if (matriz[i][8] == "b"):
-                    ardu_output("b", ip_disp)
-
-
-def restart_program():
-    """Restarts the current program.
-    Note: this function does not return. Any cleanup action (like
-    saving data) must be done before calling this function."""
-    server_on = False
-    time.sleep(30)
-    server_on = True
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
-
-
-# ------- Declarar variables de control tiempo -------#
-# ----------------------------------------------------#
-
-
-time_starting_point = time.time()  # Tomar el tiempo de inicio de ejecucion de programa para triger
-time_starting_point_alive = time.time()  # Tomar el tiempo de inicio de ejecucion de programa para triger de alive
+                disp[str(matriz[i][0])].comm(str(matriz[i][8]))       #Send command to device
 
 # ------- Inicio del programa -------#
 # -----------------------------------#
@@ -650,14 +541,9 @@ time_starting_point_alive = time.time()  # Tomar el tiempo de inicio de ejecucio
 # outfile.write('Fusce vitae leo purus, a tempor nisi.\n')
 # outfile.close()
 
-ip_dispositivos()  # Rescatar de la base de datos las ip de los dispositivos
-time_move()
-
-# client_socket = socket(AF_INET, SOCK_DGRAM)                             #Set up the Socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-# client_socket = socket(socket.AF_INET,socket.SOCK_STREAM)
 client_socket.settimeout(1)  # Only wait 1 second for a response
-address = (ip_disp1, port)  # define arduino IP and port
+
 
 os.system('clear')
 
@@ -674,31 +560,33 @@ servidor1.start()                                   # Server start to recive pac
 
 # ----------Create diccionary with all devices from DB-------------------
 
-sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
+# sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
+#
+# result = db_conexion_total(sql)
+#
+# x = 0
+# for i in range(len(result)):
+#     try:
+#         if x == 3:
+#             disp[str(result[i])] = Device(str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))
+#             x = 0
+#         x = x + 1
+#
+#     except:
+#         print "It's not possible to create devices"
+#
+#
+# #-----Create the timers for devices
+#
+# for key, value in disp.iteritems() :    #Get all dispositives ID
+#     if not disp[key].get_infi():        #the dispositive it's not infinite need a timer
+#
+#         timers[str(key)] = Timer()
+#         timers[str(key)].name = str(disp[str(key)].get_name())
+#         timers[str(key)].wtime = int(disp[str(key)].get_wtime())
+#         timers[str(key)].disp = disp[str(key)].get_ip()
 
-result = db_conexion_total(sql)
-
-x = 0
-for i in range(len(result)):
-    try:
-        if x == 3:
-            disp[str(result[i])] = Device("disp_" + str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))
-            x = 0
-        x = x + 1
-
-    except:
-        print "It's not possible to create devices"
-
-
-#-----Create the timers
-
-for key, value in disp.iteritems() :    #Get all dispositives ID
-    if not disp[key].get_infi():        #the dispositive it's not infinite need a timer
-
-        timers[str(key)] = Timer()
-        timers[str(key)].name = str(disp[str(key)].get_name())
-        timers[str(key)].wtime = int(disp[str(key)].get_wtime())
-        timers[str(key)].disp = disp[str(key)].get_ip()
+devices_timers()
 
 # -----------------Infinite timers for alarms and online pulse-------------
 
@@ -715,7 +603,6 @@ timerAutomove.beat = True  # Activate infinite counter
 timerAutomove.start()
 
 # ----------------------------------------------------------------------------------
-
 
 #---------------------------------------------------------------------------------------
 
@@ -750,5 +637,6 @@ except KeyboardInterrupt:
         print "Detectado el cierre del hilo principal"
         print "Matando hilos secundarios"
     disp = ""
+    timers = ""
     server_on = False
     os.system('sudo killall persia')
