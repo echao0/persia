@@ -21,8 +21,9 @@ DB_NAME = 'persia'
 
 datos_sql = [DB_HOST, DB_USER, DB_PASS, DB_NAME]  # Array de tados SQL
 
-# -----------------------Change process name to persia-------------------
+# -----------------------Change process name to "persia"-----------------
 import ctypes
+
 libc = ctypes.cdll.LoadLibrary('libc.so.6')
 libc.prctl(15, 'persia', 0, 0, 0)
 # -----------------------------------------------------------------------
@@ -40,28 +41,28 @@ import datetime  # Para poder consrguir la fecha de ayer
 import threading  # Para poder realizar varios Hilos
 import argparse  # biblioteca para argumentos
 
-disp = {}                 #Dic to storage objects to access using ID
-timers = {}               #Dic to storage Timers to access using ID
+disp = {}  # Dic to storage objects to access using ID
+timers = {}  # Dic to storage Timers to access using ID
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", action="store_true")
 python_args = parser.parse_args()
 
+port = 5000  # Devices default comunication port
 
-port = 5000  # Arduino default comunication port
-
-# ------- Configuracion IP Servidor Python ---------- #
+# ------- Configuration Python Server ---------- #
 server_host = '127.0.0.1'
 server_port = int(2000)  # Server socket to comunicate to webpage
 server_on = True  # Variable de control de flujo
 working = False  # variable para control pila de salida ardu_out
 
-# ------- Configuracion de tiempo -------#
+# ------- Time configuration -------#
 
-sleep_time = 0.7  # Tiempo en segundos de espera por cada bucle de programa (control de CPU)
-time_alive = 35  # Tiempo para latido de vida de Arduino
+sleep_time = 0.7  # Time to wait in infinite loop (CPU control)
+time_alive = 35  # Time to check if devices are online
 
-# ------- Declaracion de Classes ----#
+
+# -------------- Classes ------------#
 # -----------------------------------#
 class Timer():
     # cada vez que se manda el start, se reinicia el contador.
@@ -81,6 +82,10 @@ class Timer():
     def __init__(empty):
         if python_args.verbose:
             print "Clase timer creada"
+
+    def __del__(self):
+        if python_args.verbose:
+            print "El Temporizador: " + self.name + " a sido destruido"
 
     def start_short(self):
 
@@ -211,7 +216,8 @@ class Device():
             print ""
 
     def __del__(self):
-        print "El objeto: " + self.name + " a sido destruido"
+        if python_args.verbose:
+            print "El objeto: " + self.name + " a sido destruido"
 
     def get_name(self):
         return self.name
@@ -309,6 +315,11 @@ def devices_timers():
     """What for?:
        Recibe:
        Return:"""
+    global disp
+    global timers
+
+    disp = {}  # destroy all created devices
+    timers = {}  # destroy all created timers
 
     sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
 
@@ -347,27 +358,27 @@ class ServerHandler(SocketServer.BaseRequestHandler):
             datos = self.data.split(",")  # separo la cadena y formo una lista datos[1] = persiana datos[0] = accion
 
             if python_args.verbose:
-                print "Persiana: "+ datos[1]
-                print "Accion: "+ datos[0]
+                print "Persiana: " + datos[1]
+                print "Accion: " + datos[0]
 
             if datos[0] == "abajo":
                 self.request.send(str("Bajando"))
                 disp[str(datos[1])].comm("b")
-                timers[str(datos[1])].start()
 
             if datos[0] == "Subir":
                 self.request.send(str("Subiendo"))
                 disp[str(datos[1])].comm("s")
-                timers[str(datos[1])].start()
 
             if datos[0] == "stop":
                 self.request.send(str("Paro"))
                 disp[str(datos[1])].comm("z")
-                timers[str(datos[1])].start()
 
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
                 devices_timers();
+
+            if not disp[str(datos[1])].get_infi():          #If not a infinite device, start timer to automatically stop
+                timers[str(datos[1])].start()
 
 class miserver():
     global server_on
@@ -529,89 +540,59 @@ def timer_auto_lanza(matriz):  # saber con la matriz de timer_auto() si es la ho
             if (matriz[i][9] == date_time('2')):
 
                 if matriz[i][10] == 0:
-                    timers[str(matriz[i][0])].start();      #Start timer of the device
+                    timers[str(matriz[i][0])].start();  # Start timer of the device
                 else:
                     timers[str(matriz[i][0])].start_short();  # Short movement?
 
-                disp[str(matriz[i][0])].comm(str(matriz[i][8]))       #Send command to device
+                disp[str(matriz[i][0])].comm(str(matriz[i][8]))  # Send command to device
 
-# ------- Inicio del programa -------#
+
+# ----------- Program Start ---------#
 # -----------------------------------#
 # outfile = open('/var/www/html/temp/python/texto.txt', 'w') # Indicamos el valor 'w'.
 # outfile.write('Fusce vitae leo purus, a tempor nisi.\n')
 # outfile.close()
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-client_socket.settimeout(1)  # Only wait 1 second for a response
-
+client_socket.settimeout(1)                      # Only wait 1 second for a response
 
 os.system('clear')
-
-titulo = "-"
-print titulo.center(50, "-")
-titulo = '\033[1;34m Servidor Control Persianas \033[1;m'
-print titulo.center(50, " ")
-titulo = "-"
-print titulo.center(50, "-")
+if python_args.verbose:
+    titulo = "-"
+    print titulo.center(50, "-")
+    titulo = '\033[1;34m Servidor Control Persianas \033[1;m'
+    print titulo.center(50, " ")
+    titulo = "-"
+    print titulo.center(50, "-")
 
 servidor1 = miserver()
-servidor1.start()                                   # Server start to recive packets
-
+servidor1.start()  # Server start to recive packets
 
 # ----------Create diccionary with all devices from DB-------------------
 
-# sql = "SELECT `id`, `ip`, `move` FROM `dispositivos` order by `id` asc"
-#
-# result = db_conexion_total(sql)
-#
-# x = 0
-# for i in range(len(result)):
-#     try:
-#         if x == 3:
-#             disp[str(result[i])] = Device(str(result[i]), str(result[i + 1]), str(result[i + 2]),str(result[i]))
-#             x = 0
-#         x = x + 1
-#
-#     except:
-#         print "It's not possible to create devices"
-#
-#
-# #-----Create the timers for devices
-#
-# for key, value in disp.iteritems() :    #Get all dispositives ID
-#     if not disp[key].get_infi():        #the dispositive it's not infinite need a timer
-#
-#         timers[str(key)] = Timer()
-#         timers[str(key)].name = str(disp[str(key)].get_name())
-#         timers[str(key)].wtime = int(disp[str(key)].get_wtime())
-#         timers[str(key)].disp = disp[str(key)].get_ip()
-
-devices_timers()
+devices_timers()  # Create all devices and timers
 
 # -----------------Infinite timers for alarms and online pulse-------------
 
 timerLatido = Timer()
-timerLatido.name = "latido"
+timerLatido.name = "latido"         #Timer for online pulse
 timerLatido.wtime = time_alive
 timerLatido.beat = True  # Activate infinite counter
 timerLatido.start()
 
 timerAutomove = Timer()
-timerAutomove.name = "automove"
+timerAutomove.name = "automove"     #Timer for automovement
 timerAutomove.wtime = 60
 timerAutomove.beat = True  # Activate infinite counter
 timerAutomove.start()
 
-# ----------------------------------------------------------------------------------
-
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 
 try:
     while (1):
-        # [[3, 1, 1, 0, 0, 1, 1, 1, 's', '07:50']]
 
         if timerAutomove.get_trigger() == True:
-            var1 = timer_auto()  # control de timers programados para movimiento automatico. Esto devuelve la matriz con lo necesario.
+            var1 = timer_auto()                        # control de timers programados para movimiento automatico. Esto devuelve la matriz con lo necesario.
             timer_auto_lanza(var1)
             timerAutomove.set_trigger(False)
 
@@ -623,7 +604,6 @@ try:
                 print "----------------"
 
             for key, value in disp.iteritems():
-                print key
                 disp[str(key)].latido()
 
             if python_args.verbose:
