@@ -545,7 +545,7 @@ function climb_select(){
 //---------------------------------------------------------------//
 // Funcion para traer el estado del dispositivo de la base de datos y actualizar la pagina web //
 
-function automatico(){
+function backup_automatico(){
 	
 		$.post('php/global.php', {name:"b",data:"beat"}, function(data){ 	//Beat de control de servidor activo
 		
@@ -563,8 +563,7 @@ function automatico(){
 			
 				if (data == "online" || data == "ONLINE"){
 					$("div#name-data2").css("color","#0B0"); //cambio el colo a Verde si está online
-					//$("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
-					
+					//$("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online	
 				}
 				
 				if (data == "offline" || data == "OFFLINE"){
@@ -632,6 +631,66 @@ function automatico(){
 			}
 			
 		});
+}
+
+
+function automatico(){
+    
+           
+                $.post('php/global.php', {name:"b",data:"beat"}, function(data){    //Beat de control de servidor activo
+        
+                    if (data){  
+                            $('div#name-data1').text("ONLINE"); //es el servidor
+                            $("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
+
+                            
+
+                                                 function modWeb(param, id) {
+
+                                                        //console.log(id);
+                                                        //console.log(param);
+                                                        
+                                                        var idplus= id +1;
+
+                                                        $("div#name-data"+idplus).text(param);                                          
+                                                
+                                                        $("div#funciones").css("background-color",$("#body").css("background-color")); // cambio el color al mismo que body del fondo de div funciones 
+
+                                                        if (param == "online" || param == "ONLINE"){$("div#name-data"+idplus).css("color","#0B0"); }//cambio el colo a Verde si está online
+                                                
+                                                        if (param == "offline" || param == "OFFLINE"){$("div#name-data"+idplus).css("color","#E00"); }// cambio el color a Rojo si está offline    
+
+                                                 }
+
+                                                 function getDeviceStatus(id, callback){
+                                                        $.post('php/global.php', {name:"s" , disp:id}, function(data1){
+                                                        callback(data1, id);});
+
+                                                    }
+                        for (ki=1; ki<4; ki++) {
+                                                getDeviceStatus(ki, modWeb);
+
+                                         };
+
+                     } else {
+                    
+                    
+                    $('div#name-data1').text    ("Server off"); 
+                    $("div#name-data1").css("color","#E00"); // cambio el color a Rojo si está offline
+                    $('div#name-data2').text    ("Server off"); 
+                    $("div#name-data2").css("color","#E00"); // cambio el color a Rojo si está offline
+                                    $('div#name-data3').text    ("Server off"); 
+                    $("div#name-data3").css("color","#E00"); // cambio el color a Rojo si está offline
+                                    $('div#name-data4').text    ("Server off"); 
+                    $("div#name-data4").css("color","#E00"); // cambio el color a Rojo si está offline
+                                    $("div#funciones").css("background-color","#E00"); // cambio el color a Rojo si está offline del fondo de funciones
+                                
+                    }
+            
+        });       
+            
+            
+    
 }
 
 //---------------------------------------------------------------//

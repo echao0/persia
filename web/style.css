@@ -20,8 +20,9 @@ body {font-family:"Courier New", Courier, monospace;font-size: 13px;color: #0000
  .menu_general { width:310px; height:auto; float:left;border:0px  solid black; padding-bottom:10px;}
  .menu_general_titulo { width:269px; height:auto; float:left; margin-top:10px; margin-left:20px; margin-bottom:10px; font-size:20px; }
  .logout {float:right; font-size:6px; width:30px; padding-right:35px; padding-top:5px;}
- .dispositivo_top{float: left;width: 110px; height:20px; padding-top:0px;margin-left:30px;}
- .dispositivo{width: 110px; height:16px; padding-top:0px;margin-left:30px; float: left;}
+ .dispositivo_top{float: left;width: 112px; height:20px; padding-top:0px;margin-left:30px;}
+ .dispositivo{width: 112px; height:16px; padding-top:0px;margin-left:30px; float: left;}
+ #disp_status{float: left; max-height: 50px; overflow: auto;}
 
 /*+++++++ MAIN +++++++*/
 

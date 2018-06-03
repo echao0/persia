@@ -157,18 +157,20 @@
             <div id="dispositivos" class=" menu_general">
                 <div id="dispositivos_titulo" class=" menu_general_titulo"> Dispositivos </div>
 				
-				<div id="disp-serv" class="dispositivo_top">Servidor :</div>
-				<div id="name-data1" class="name-data">Cargando</div>	
-				
-                <div id="disp-num" class="dispositivo">Dispositivo 1:</div>
-		<div id="name-data2" class="name-data">Cargando</div>
-                                
-                <div id="disp-num" class="dispositivo">Dispositivo 2:</div>
-		<div id="name-data3" class="name-data">Cargando</div>
-                                
-                <div id="disp-num" class="dispositivo">Dispositivo 3:</div>
-		<div id="name-data4" class="name-data">Cargando</div>
-                                
+				<div id="disp_status">
+					<div id="disp-serv" class="dispositivo_top">Servidor :</div>
+					<div id="name-data1" class="name-data">Cargando</div>	
+					
+	                <div id="disp-num" class="dispositivo">Dispositivo 1:</div>
+					<div id="name-data2" class="name-data">Cargando</div>
+	                                
+	                <div id="disp-num" class="dispositivo">Dispositivo 2:</div>
+					<div id="name-data3" class="name-data">Cargando</div>
+	                                
+	                <div id="disp-num" class="dispositivo">Dispositivo 3:</div>
+					<div id="name-data4" class="name-data">Cargando</div>
+	            </div>                    
+                
                 <div id="config">
                 
                     
