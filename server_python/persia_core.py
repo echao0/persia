@@ -237,6 +237,9 @@ class Device():
     def get_infi(self):
         return self.infi
 
+    def set_infi(self, new_infi):
+        self.infi = new_infi
+
     def set_ip(self, new_ip):
         self.ip = new_ip
 
@@ -339,6 +342,9 @@ def devices_timers():
     # -----Create the timers for devices
 
     for key, value in disp.iteritems():  # Get all dispositives ID
+
+        if int(disp[str(key)].get_wtime()) == 0: disp[key].set_infi(True) # if move time like 0 its and infinite device and not timer needed
+
         if not disp[key].get_infi():  # the dispositive it's not infinite need a timer
 
             timers[str(key)] = Timer()
