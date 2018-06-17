@@ -1,3 +1,7 @@
+//--------------------Variables globales ------------------------//
+//---------------------------------------------------------------//
+
+
 //-------------Definiciones de automatismos ----------------------//
 //---------------------------------------------------------------//
 
@@ -63,7 +67,7 @@ $("#per1").click(function(){
 
 $("#lock").click(function(){
     var color = $("#lock").css("background-color");
-   
+
     if (color =='rgb(166, 166, 166)'){
          $("#lock").css("background-color", "#DFDFDF");
          $("#conf-input1").prop("disabled", true);
@@ -129,16 +133,33 @@ $("#save").click(function(){
 
 //Boton de configuraciones
 $("#func1").click(function(){
+  
+//--------------------Config device text with ip number
+
+    $.post('php/global.php', {name:"number"},function(data){
     
-    $.post('php/global.php', {name:"c" , disp:"0" , field:"ip"}, function(data){$('#conf-input0').val(data);});
-    $.post('php/global.php', {name:"c" , disp:"1" , field:"ip"}, function(data){$('#conf-input1').val(data);});
-    $.post('php/global.php', {name:"c" , disp:"2" , field:"ip"}, function(data){$('#conf-input2').val(data);});
-    $.post('php/global.php', {name:"c" , disp:"3" , field:"ip"}, function(data){$('#conf-input3').val(data);});
+    function assingIp(param, id) {$('#conf-input'+id).val(param);}
+
+    function getDeviceIp(id, callback){
+        $.post('php/global.php', {name:"c" , disp:i , field:"ip"}, function(data1){
+                callback(data1, id);});}
+
+    for (i=0; i<=data; i++) {getDeviceIp(i, assingIp);};
+
+
+//--------------------Config device text with move time
+
+    function assingMove(param, id) {$('#conf-time'+id).val(param);}
+
+    function getDeviceMove(id, callback){
+        $.post('php/global.php', {name:"c" , disp:i , field:"move"}, function(data2){
+                callback(data2, id);});}
+                                      
+    for (i=0; i<=data; i++) {getDeviceMove(i, assingMove);}; 
+
+    });
     
-    $.post('php/global.php', {name:"c" , disp:"1" , field:"move"}, function(data){$('#conf-time1').val(data);});
-    $.post('php/global.php', {name:"c" , disp:"2" , field:"move"}, function(data){$('#conf-time2').val(data);});
-    $.post('php/global.php', {name:"c" , disp:"3" , field:"move"}, function(data){$('#conf-time3').val(data);});
-                
+
     $("#lock").css("background-color", "")
     $("#bottom").hide("slow");
     $("#botones").hide("slow");
@@ -151,7 +172,6 @@ $("#func1").click(function(){
 });
 //Boton de persianas
 $("#func3").click(function(){
-    
     
     $("#persiana").css("margin-top", "");
      
@@ -190,6 +210,34 @@ $("#func2").click(function(){
     $("#temporizador").show("slow");
     
 });
+
+function create_device_status_div(){
+        $.post('php/global.php', {name:"number"},function(data){devices_num = data;}); //Create a global variable with total number of devices
+        
+        $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
+                
+                for (var i = 1; i <= data; i++) {
+                    var o = i+1;
+        //-------------------------------------------------------Devices status
+                    $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Dispositivo " +  i + ":",}).appendTo('#disp_status');
+                    $('<div/>', {id: 'name-data' + o,class: 'name-data',title: '',text: "Cargando",}).appendTo('#disp_status');
+
+        //-------------------------------------------------------Devices IP
+
+                    $('<div/>', {id: 'conf-disp',class: 'conf-name',title: '',text: "Dispositivo " +  i + ":", }).appendTo('#config');
+                    $('<div/>', {id: 'conf-ip'+i,class: 'conf-ip',title: '',}).appendTo('#config');
+                    $('<input>', {type: 'text',id: 'conf-input'+i,class: 'conf-input',disabled: ""}).appendTo('#conf-ip'+i);
+            }
+
+                for (var i = 1; i <= data; i++) {
+        //-------------------------------------------------------Devices Move Time
+                    $('<div/>', {id: 'div-conf-time'+i,class: 'conf-name',title: '',text: "Tiempo mov " +  i + " :",}).appendTo('#config');        
+                    $('<div/>', {id: 'sdiv-conf-time'+i,class: 'conf-ip',title: '',}).appendTo('#config');
+                    $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-input',disabled: ""}).appendTo('#sdiv-conf-time'+i);
+            }
+        })
+    }     
+
 
 //Funcion para resetear pantalla de timers
 
@@ -545,100 +593,11 @@ function climb_select(){
 //---------------------------------------------------------------//
 // Funcion para traer el estado del dispositivo de la base de datos y actualizar la pagina web //
 
-function backup_automatico(){
-	
-		$.post('php/global.php', {name:"b",data:"beat"}, function(data){ 	//Beat de control de servidor activo
-		
-			if (data){														//Si no contesta el servidor está en off
-                        
-                        $('div#name-data1').text("ONLINE"); //es el servidor
-                        $("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
-                        
-			$.post('php/global.php', {name:"s" , disp:"1"}, function(data){ 
-			
-                            $('div#name-data2').text(data);
-                        
-                        //$("div#funciones").css("background-color","#CCCCCC"); // cambio el color a normal del fondo de funciones
-                        $("div#funciones").css("background-color",$("div#body").css("background-color")); // cambio el color al mismo que body del fondo de div funciones 
-			
-				if (data == "online" || data == "ONLINE"){
-					$("div#name-data2").css("color","#0B0"); //cambio el colo a Verde si está online
-					//$("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online	
-				}
-				
-				if (data == "offline" || data == "OFFLINE"){
-					$("div#name-data2").css("color","#E00"); // cambio el color a Rojo si está offline
-					
-				}
-                                
-		});
-                        $.post('php/global.php', {name:"s" , disp:"2"}, function(data){ 
-			
-			
-                            $('div#name-data3').text(data);
-                        
-                        //$("div#funciones").css("background-color","#CCCCCC"); // cambio el color a normal del fondo de funciones
-                        $("div#funciones").css("background-color",$("div#body").css("background-color")); // cambio el color al mismo que body del fondo de div funcione      
-			
-				if (data == "online" || data == "ONLINE"){
-					$("div#name-data3").css("color","#0B0"); //cambio el colo a Verde si está online
-					//$("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
-					
-				}
-				
-				if (data == "offline" || data == "OFFLINE"){
-					$("div#name-data3").css("color","#E00"); // cambio el color a Rojo si está offline
-					
-				}
-                                
-		});
-                        
-			$.post('php/global.php', {name:"s" , disp:"3"}, function(data){ 
-			
-			
-                            $('div#name-data4').text(data);
-                        
-                        //$("div#funciones").css("background-color","#CCCCCC"); // cambio el color a normal del fondo de funciones
-                        $("div#funciones").css("background-color",$("div#body").css("background-color")); // cambio el color al mismo que body del fondo de div funcione
-                                
-			
-				if (data == "online" || data == "ONLINE"){
-					$("div#name-data4").css("color","#0B0"); //cambio el colo a Verde si está online
-					//$("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
-					
-				}
-				
-				if (data == "offline" || data == "OFFLINE"){
-					$("div#name-data4").css("color","#E00"); // cambio el color a Rojo si está offline
-					
-				}
-                                
-		});										
-													
-			} else {
-				
-				
-				$('div#name-data1').text	("Server off"); 
-				$("div#name-data1").css("color","#E00"); // cambio el color a Rojo si está offline
-				$('div#name-data2').text	("Server off"); 
-				$("div#name-data2").css("color","#E00"); // cambio el color a Rojo si está offline
-                                $('div#name-data3').text	("Server off"); 
-				$("div#name-data3").css("color","#E00"); // cambio el color a Rojo si está offline
-                                $('div#name-data4').text	("Server off"); 
-				$("div#name-data4").css("color","#E00"); // cambio el color a Rojo si está offline
-                                $("div#funciones").css("background-color","#E00"); // cambio el color a Rojo si está offline del fondo de funciones
-                                
-			}
-			
-		});
-}
-
-
 function automatico(){
-    
-           
+
                 $.post('php/global.php', {name:"b",data:"beat"}, function(data){    //Beat de control de servidor activo
-        
+                  $.post('php/global.php', {name:"number"},function(data1){   //get number of devices from db
+
                     if (data){  
                             $('div#name-data1').text("ONLINE"); //es el servidor
                             $("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
@@ -667,26 +626,21 @@ function automatico(){
                                                         callback(data1, id);});
 
                                                     }
-                        for (ki=1; ki<4; ki++) {
+                            
+                                        for (ki=1; ki<=data1; ki++) {
                                                 getDeviceStatus(ki, modWeb);
 
                                          };
-
+                                    
                      } else {
                     
-                    
-                    $('div#name-data1').text    ("Server off"); 
-                    $("div#name-data1").css("color","#E00"); // cambio el color a Rojo si está offline
-                    $('div#name-data2').text    ("Server off"); 
-                    $("div#name-data2").css("color","#E00"); // cambio el color a Rojo si está offline
-                                    $('div#name-data3').text    ("Server off"); 
-                    $("div#name-data3").css("color","#E00"); // cambio el color a Rojo si está offline
-                                    $('div#name-data4').text    ("Server off"); 
-                    $("div#name-data4").css("color","#E00"); // cambio el color a Rojo si está offline
+                            for (ki=1; ki<=data1+1; ki++) {     
+                                    $('div#name-data'+ki).text    ("Server off"); 
+                                    $("div#name-data"+ki).css("color","#E00"); // cambio el color a Rojo si está offline
                                     $("div#funciones").css("background-color","#E00"); // cambio el color a Rojo si está offline del fondo de funciones
-                                
+                                }
                     }
-            
+            });
         });       
             
             

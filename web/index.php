@@ -1,5 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Persia</title>
@@ -11,8 +14,8 @@
 </head>
 
 
-<body onLoad="setInterval('automatico()',2000);">
-
+<body>
+<script> document.body.onload = function() { create_device_status_div();setInterval('automatico()',2000);}</script>
 
 <div id="canvas">
 
@@ -160,15 +163,6 @@
 				<div id="disp_status">
 					<div id="disp-serv" class="dispositivo_top">Servidor :</div>
 					<div id="name-data1" class="name-data">Cargando</div>	
-					
-	                <div id="disp-num" class="dispositivo">Dispositivo 1:</div>
-					<div id="name-data2" class="name-data">Cargando</div>
-	                                
-	                <div id="disp-num" class="dispositivo">Dispositivo 2:</div>
-					<div id="name-data3" class="name-data">Cargando</div>
-	                                
-	                <div id="disp-num" class="dispositivo">Dispositivo 3:</div>
-					<div id="name-data4" class="name-data">Cargando</div>
 	            </div>                    
                 
                 <div id="config">
@@ -177,24 +171,8 @@
                     <div id="conf-disp" class="conf-name">Servidor :</div>
                     <div id="conf-ip0" class="conf-ip"><input id="conf-input0" type="text" class="conf-input" disabled></input></div>
                     
-                    <div id="conf-disp" class="conf-name">Dispositivo 1:</div>
-                    <div id="conf-ip1" class="conf-ip"><input id="conf-input1" type="text" class="conf-input" disabled></input></div>
-                    
-                    <div id="conf-disp" class="conf-name">Dispositivo 2:</div>
-                    <div id="conf-ip2" class="conf-ip"><input id="conf-input2" type="text"  class="conf-input" disabled></input></div>
-                    
-                    <div id="conf-disp" class="conf-name">Dispositivo 3:</div>
-                    <div id="conf-ip3" class="conf-ip"><input id="conf-input3" type="text"  class="conf-input" disabled></input></div>
                     
                     
-                    <div id="div-conf-time1" class="conf-name">Tiempo mov 1 :</div>
-                    <div id="sdiv-conf-time1" class="conf-ip"><input id="conf-time1" type="text"  class="conf-input" disabled></input></div>
-                    
-                    <div id="div-conf-time2" class="conf-name">Tiempo mov 2 :</div>
-                    <div id="sdiv-conf-time2" class="conf-ip"><input id="conf-time2" type="text"  class="conf-input" disabled></input></div>
-                    
-                    <div id="div-conf-time3" class="conf-name">Tiempo mov 3 :</div>
-                    <div id="sdiv-conf-time3" class="conf-ip"><input id="conf-time3" type="text"  class="conf-input" disabled></input></div>
                     
                 
                 </div>
