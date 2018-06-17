@@ -166,14 +166,9 @@
 	            </div>                    
                 
                 <div id="config">
-                
-                    
+                                   
                     <div id="conf-disp" class="conf-name">Servidor :</div>
                     <div id="conf-ip0" class="conf-ip"><input id="conf-input0" type="text" class="conf-input" disabled></input></div>
-                    
-                    
-                    
-                    
                 
                 </div>
                                 

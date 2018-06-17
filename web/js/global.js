@@ -35,6 +35,18 @@ $("#night").click(function(){
 //---------------------------------------------------------------//
 //--------------Cambio de color de icono persiana----------------//
 
+$.post('php/global.php', {name:"number"},function(data){
+
+                 for (i=1; i<=data; i++) {
+
+                        $('<div/>', {id: 'per'+i, class: 'per',title: '',style:""}).appendTo('#persiana');
+                    };
+
+            
+        
+});
+
+
 
 $("#per3").click(function(){
     $("#per1").css("background-color", ""); 
@@ -70,26 +82,29 @@ $("#lock").click(function(){
 
     if (color =='rgb(166, 166, 166)'){
          $("#lock").css("background-color", "#DFDFDF");
-         $("#conf-input1").prop("disabled", true);
-         $("#conf-input2").prop("disabled", true);
-         $("#conf-input3").prop("disabled", true);
-         
-         $("#conf-time1").prop("disabled", true);
-         $("#conf-time2").prop("disabled", true);
-         $("#conf-time3").prop("disabled", true);
+
+         $.post('php/global.php', {name:"number"},function(data){
+
+                 for (i=1; i<=data; i++) {
+                        $("#conf-input"+i).prop("disabled", true);
+                        $("#conf-time"+i).prop("disabled", true);
+                    };
+
+         });
          $("#save").hide("slow");
          $("#save2").hide("slow");
          
     }else {
          $("#lock").css("background-color", "#A6A6A6");
-         $("#conf-input1").prop("disabled", false);
-         $("#conf-input2").prop("disabled", false);
-         $("#conf-input3").prop("disabled", false);
-         
-         $("#conf-time1").prop("disabled", false);
-         $("#conf-time2").prop("disabled", false);
-         $("#conf-time3").prop("disabled", false);
-         
+
+         $.post('php/global.php', {name:"number"},function(data){
+
+                 for (i=1; i<=data; i++) {
+                        $("#conf-input"+i).prop("disabled", false);
+                        $("#conf-time"+i).prop("disabled", false);
+                    };
+         });
+
          $("#save").show("slow");
          
     }
@@ -100,26 +115,21 @@ $("#save").click(function(){
     var result = confirm("¿Desea guardar los nuevos valores en la base de datos?");
     
     if (result == true){ 
-        
-        $.post('php/global.php', {name:"u_ip", disp:"1", ip:$('#conf-input1').val(), field:"ip"}, function(data){});
-        $.post('php/global.php', {name:"u_ip", disp:"2", ip:$('#conf-input2').val(), field:"ip"}, function(data){});
-        $.post('php/global.php', {name:"u_ip", disp:"3", ip:$('#conf-input3').val(), field:"ip"}, function(data){});
-        
-        $.post('php/global.php', {name:"u_move", disp:"1", time:$('#conf-time1').val(), field:"move"}, function(data){});
-        $.post('php/global.php', {name:"u_move", disp:"2", time:$('#conf-time2').val(), field:"move"}, function(data){});
-        $.post('php/global.php', {name:"u_move", disp:"3", time:$('#conf-time3').val(), field:"move"}, function(data){});
+
+         $.post('php/global.php', {name:"number"},function(data){
+
+                 for (i=1; i<=data; i++) {
+                        $.post('php/global.php', {name:"u_ip", disp:i, ip:$('#conf-input'+i).val(), field:"ip"}, function(data){});
+                        $.post('php/global.php', {name:"u_move", disp:i, time:$('#conf-time'+i).val(), field:"move"}, function(data){});
+                        $("#conf-input"+i).prop("disabled", true);
+                        $("#conf-time"+i).prop("disabled", true);
+                    };
+         });
         
         var data = "update";
         send_server(data,"1");                                                  //Obligo al servidor a que actualize las ip y el tiempo.
         
          $("#lock").css("background-color", "#DFDFDF");
-         $("#conf-input1").prop("disabled", true);
-         $("#conf-input2").prop("disabled", true);
-         $("#conf-input3").prop("disabled", true);
-         
-         $("#conf-time1").prop("disabled", true);
-         $("#conf-time2").prop("disabled", true);
-         $("#conf-time3").prop("disabled", true);
          $("#save").hide("slow");
          $("#save2").hide("slow");
         
@@ -172,7 +182,7 @@ $("#func1").click(function(){
 });
 //Boton de persianas
 $("#func3").click(function(){
-    
+
     $("#persiana").css("margin-top", "");
      
     $("#dispositivos").hide("slow");
@@ -212,7 +222,7 @@ $("#func2").click(function(){
 });
 
 function create_device_status_div(){
-        $.post('php/global.php', {name:"number"},function(data){devices_num = data;}); //Create a global variable with total number of devices
+        
         
         $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
                 
