@@ -58,13 +58,13 @@ class Table{
          echo '</script>';
         }
         
-    function getAllInfo($type , $disp, $field, $data, $short){
-        
+    function getAllInfo($type=null , $disp=null, $field=null, $data=null, $short=null){
+		
         if ($type == 'number'){
             //Creamos la consulta
             $sql = "SELECT MAX(id) FROM `dispositivos` "; 
         }
-
+		
         if ($type == 'status'){
         	//Creamos la consulta
         	$sql = "SELECT status FROM dispositivos WHERE id ='".$disp."'";

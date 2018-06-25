@@ -1,7 +1,3 @@
-//--------------------Variables globales ------------------------//
-//---------------------------------------------------------------//
-
-
 //-------------Definiciones de automatismos ----------------------//
 //---------------------------------------------------------------//
 
@@ -35,18 +31,6 @@ $("#night").click(function(){
 //---------------------------------------------------------------//
 //--------------Cambio de color de icono persiana----------------//
 
-$.post('php/global.php', {name:"number"},function(data){
-
-                 for (i=1; i<=data; i++) {
-
-                        $('<div/>', {id: 'per'+i, class: 'per',title: '',style:""}).appendTo('#persiana');
-                    };
-
-            
-        
-});
-
-
 
 $("#per3").click(function(){
     $("#per1").css("background-color", ""); 
@@ -75,7 +59,6 @@ $("#per1").click(function(){
  if  ($("#temporizador").css("display") == "block"){get_tempo_1();$("#save2").hide("slow");}
     
 });
-
 
 $("#lock").click(function(){
     var color = $("#lock").css("background-color");
@@ -136,12 +119,14 @@ $("#save").click(function(){
     };
     
     });
+	
 
 
 //---------------------------------------------------------------//
 //Movimiento de DIV
 
 //Boton de configuraciones
+
 $("#func1").click(function(){
   
 //--------------------Config device text with ip number
@@ -180,9 +165,11 @@ $("#func1").click(function(){
     $("#dispositivos").show("slow");
     $("#save2").hide("slow");
 });
+
 //Boton de persianas
 $("#func3").click(function(){
-
+    
+    
     $("#persiana").css("margin-top", "");
      
     $("#dispositivos").hide("slow");
@@ -220,34 +207,6 @@ $("#func2").click(function(){
     $("#temporizador").show("slow");
     
 });
-
-function create_device_status_div(){
-        
-        
-        $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
-                
-                for (var i = 1; i <= data; i++) {
-                    var o = i+1;
-        //-------------------------------------------------------Devices status
-                    $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Dispositivo " +  i + ":",}).appendTo('#disp_status');
-                    $('<div/>', {id: 'name-data' + o,class: 'name-data',title: '',text: "Cargando",}).appendTo('#disp_status');
-
-        //-------------------------------------------------------Devices IP
-
-                    $('<div/>', {id: 'conf-disp',class: 'conf-name',title: '',text: "Dispositivo " +  i + ":", }).appendTo('#config');
-                    $('<div/>', {id: 'conf-ip'+i,class: 'conf-ip',title: '',}).appendTo('#config');
-                    $('<input>', {type: 'text',id: 'conf-input'+i,class: 'conf-input',disabled: ""}).appendTo('#conf-ip'+i);
-            }
-
-                for (var i = 1; i <= data; i++) {
-        //-------------------------------------------------------Devices Move Time
-                    $('<div/>', {id: 'div-conf-time'+i,class: 'conf-name',title: '',text: "Tiempo mov " +  i + " :",}).appendTo('#config');        
-                    $('<div/>', {id: 'sdiv-conf-time'+i,class: 'conf-ip',title: '',}).appendTo('#config');
-                    $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-input',disabled: ""}).appendTo('#sdiv-conf-time'+i);
-            }
-        })
-    }     
-
 
 //Funcion para resetear pantalla de timers
 
@@ -657,6 +616,54 @@ function automatico(){
     
 }
 
+function create_device_status_div(){
+        
+        $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
+                
+                for (var i = 1; i <= data; i++) {
+                    var o = i+1;
+        //-------------------------------------------------------Devices status
+                    $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Dispositivo " +  i + ":",}).appendTo('#disp_status');
+                    $('<div/>', {id: 'name-data' + o,class: 'name-data',title: '',text: "Cargando",}).appendTo('#disp_status');
+
+        //-------------------------------------------------------Devices IP
+
+                    $('<div/>', {id: 'conf-disp',class: 'conf-name',title: '',text: "Dispositivo " +  i + ":", }).appendTo('#config');
+                    $('<div/>', {id: 'conf-ip'+i,class: 'conf-ip',title: '',}).appendTo('#config');
+                    $('<input>', {type: 'text',id: 'conf-input'+i,class: 'conf-input',disabled: ""}).appendTo('#conf-ip'+i);
+            }
+
+                for (var i = 1; i <= data; i++) {
+        //-------------------------------------------------------Devices Move Time
+                    $('<div/>', {id: 'div-conf-time'+i,class: 'conf-name',title: '',text: "Tiempo mov " +  i + " :",}).appendTo('#config');        
+                    $('<div/>', {id: 'sdiv-conf-time'+i,class: 'conf-ip',title: '',}).appendTo('#config');
+                    $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-input',disabled: ""}).appendTo('#sdiv-conf-time'+i);
+                   
+				    $('<div/>', {
+								    id: 'per'+i,
+								    class: 'per',click: function(){
+								    						
+    														
+														    $('div[id ^= per]').css("background-color", ""); 
+														   
+														    $(this).css("background-color", "#A6A6A6");
+														    
+														    //Añado todo lo que corresponde a timers
+														    var currentId = $(this).attr('id');
+														    currentId ="get_tempo_"+currentId.substr(3);
+														    
+														   
+														    if  ($("#temporizador").css("display") == "block"){eval( currentId + '()' );$("#save2").hide("slow"); }
+
+    														 
+
+    														}
+								    
+								}).appendTo('#persiana');
+            }
+        })
+    }  
+	
 //---------------------------------------------------------------//
 //Enviar los datos a pagina PHP que se lo envía al servidor.
 // DATA es la acción y DATA2 es la perisana que se debe controlar.

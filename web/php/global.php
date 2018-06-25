@@ -12,7 +12,6 @@
 //pd = Recuperar los dias que afectan a los contadores
 //t_checkb == actualizar el estado de los checkbox
 //t_days = Cambiar el estado de los dias activos !activos en la DB
-//number = Numero de dispositivos que tenemos en DB
 
 //-----------------------POST-------------------------------------//
 //
@@ -24,15 +23,13 @@
 //data2 =
 
 if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
-		
 		if ( $_POST['name'] === "number" ) {
 			require 'conector.php';
 			$datos = new Table();
 			$estado = $datos->getAllInfo('number');
 			echo $estado [0]['MAX(id)'];
 		};
-
-
+		
 		if ( $_POST['name'] === "s" ) {
 			require 'conector.php';
 			$datos = new Table();

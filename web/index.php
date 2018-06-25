@@ -1,8 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-
-
-
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>Persia</title>
@@ -15,7 +12,8 @@
 
 
 <body>
-<script> document.body.onload = function() { create_device_status_div();setInterval('automatico()',2000);}</script>
+<script> document.body.onload = function() {create_device_status_div();setInterval('automatico()',2000);}</script>
+
 
 <div id="canvas">
 
@@ -154,8 +152,7 @@
      </div> 
      
      
-     
-    	<div id="top_up">
+		<div id="top_up">
             
             <div id="dispositivos" class=" menu_general">
                 <div id="dispositivos_titulo" class=" menu_general_titulo"> Dispositivos </div>
@@ -180,6 +177,8 @@
             </div>
             
        </div>
+	   
+    	
      
        
      
@@ -192,9 +191,7 @@
                 <div id="boton_down" class="boton_per"> </div>
             </div>
            <div id="persiana" class="menu_general"> 
-               <div id="per1" class="per"></div>
-               <div id="per2" class="per"></div>
-               <div id="per3" class="per"></div>
+
                <div id="night" class="funcNigth"></div>
                
            </div>
