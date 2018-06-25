@@ -12,7 +12,7 @@
 
 
 <body>
-<script> document.body.onload = function() {create_device_status_div();setInterval('automatico()',2000);}</script>
+<script> document.body.onload = function() {get_devices(); create_device_status_div(); setInterval('automatico()',2000);}</script>
 
 
 <div id="canvas">

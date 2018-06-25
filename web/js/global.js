@@ -1,32 +1,9 @@
-//-------------Definiciones de automatismos ----------------------//
+//------------------Variables Globales ---------------------------//
 //---------------------------------------------------------------//
 
-//---------------------------------------------------------------//
-//--------------Cambio de color de modo noche-------------------//
+var devices_numbers;
 
-$("#night").click(function(){
-    
-    
-    if ($('body').css("background-color") == 'rgb(204, 204, 204)'){ 
-            $("body").css("background-color", "#444141");
-            $("#top_down").css("background-color", "#515151");
-            $("#bottom").css("background-color", "#515151");
-            $("#dispositivos").css("background-color", "#515151");
-            $("#temporizador").css("background-color", "#515151");
-            
-            $("#night").css("background-color", "#A6A6A6");   
-    }else{
-            $("body").css("background-color", "#CCCCCC");
-            $("#top_down").css("background-color", "#C2C2C2");
-            $("#bottom").css("background-color", "#C2C2C2");
-            $("#dispositivos").css("background-color", "#C2C2C2");
-            $("#temporizador").css("background-color", "#C2C2C2");
-            $("#night").css("background-color", "#DFDFDF"); 
-        
-    }
-        
-    
-});
+
 
 //---------------------------------------------------------------//
 //--------------Cambio de color de icono persiana----------------//
@@ -66,27 +43,21 @@ $("#lock").click(function(){
     if (color =='rgb(166, 166, 166)'){
          $("#lock").css("background-color", "#DFDFDF");
 
-         $.post('php/global.php', {name:"number"},function(data){
+         for (i=1; i<=devices_numbers; i++) {
+                $("#conf-input"+i).prop("disabled", true);
+                $("#conf-time"+i).prop("disabled", true);
+            };
 
-                 for (i=1; i<=data; i++) {
-                        $("#conf-input"+i).prop("disabled", true);
-                        $("#conf-time"+i).prop("disabled", true);
-                    };
-
-         });
          $("#save").hide("slow");
          $("#save2").hide("slow");
          
     }else {
          $("#lock").css("background-color", "#A6A6A6");
 
-         $.post('php/global.php', {name:"number"},function(data){
-
-                 for (i=1; i<=data; i++) {
-                        $("#conf-input"+i).prop("disabled", false);
-                        $("#conf-time"+i).prop("disabled", false);
-                    };
-         });
+         for (i=1; i<=devices_numbers; i++) {
+                $("#conf-input"+i).prop("disabled", false);
+                $("#conf-time"+i).prop("disabled", false);
+           };
 
          $("#save").show("slow");
          
@@ -99,15 +70,12 @@ $("#save").click(function(){
     
     if (result == true){ 
 
-         $.post('php/global.php', {name:"number"},function(data){
-
-                 for (i=1; i<=data; i++) {
-                        $.post('php/global.php', {name:"u_ip", disp:i, ip:$('#conf-input'+i).val(), field:"ip"}, function(data){});
-                        $.post('php/global.php', {name:"u_move", disp:i, time:$('#conf-time'+i).val(), field:"move"}, function(data){});
-                        $("#conf-input"+i).prop("disabled", true);
-                        $("#conf-time"+i).prop("disabled", true);
-                    };
-         });
+	     for (i=1; i<=devices_numbers; i++) {
+	            $.post('php/global.php', {name:"u_ip", disp:i, ip:$('#conf-input'+i).val(), field:"ip"}, function(data){});
+	            $.post('php/global.php', {name:"u_move", disp:i, time:$('#conf-time'+i).val(), field:"move"}, function(data){});
+	            $("#conf-input"+i).prop("disabled", true);
+	            $("#conf-time"+i).prop("disabled", true);
+	        };
         
         var data = "update";
         send_server(data,"1");                                                  //Obligo al servidor a que actualize las ip y el tiempo.
@@ -130,16 +98,14 @@ $("#save").click(function(){
 $("#func1").click(function(){
   
 //--------------------Config device text with ip number
-
-    $.post('php/global.php', {name:"number"},function(data){
-    
+ 
     function assingIp(param, id) {$('#conf-input'+id).val(param);}
 
     function getDeviceIp(id, callback){
         $.post('php/global.php', {name:"c" , disp:i , field:"ip"}, function(data1){
                 callback(data1, id);});}
 
-    for (i=0; i<=data; i++) {getDeviceIp(i, assingIp);};
+    for (i=0; i<=devices_numbers; i++) {getDeviceIp(i, assingIp);};
 
 
 //--------------------Config device text with move time
@@ -150,10 +116,8 @@ $("#func1").click(function(){
         $.post('php/global.php', {name:"c" , disp:i , field:"move"}, function(data2){
                 callback(data2, id);});}
                                       
-    for (i=0; i<=data; i++) {getDeviceMove(i, assingMove);}; 
+    for (i=0; i<=devices_numbers; i++) {getDeviceMove(i, assingMove);}; 
 
-    });
-    
 
     $("#lock").css("background-color", "")
     $("#bottom").hide("slow");
@@ -552,11 +516,14 @@ $('#boton_down').on('click' , function(){						//Hacer que el boton funcione par
 // Utilizo el color de fondo que he cambiado previamente.
 
 function climb_select(){
-    var i;
-    for (i = 1; i <= 3; i++) {
-        var color = $('#per'+i).css("background-color");
-        if (color == 'rgb(166, 166, 166)'){ return i;}
-    }
+		
+			    
+			    var i;
+			    for (i = 1; i <= devices_numbers; i++) {
+			        var color = $('#per'+i).css("background-color");
+			        if (color == 'rgb(166, 166, 166)'){return i;}
+			    }
+		   
 }
 
 //---------------------------------------------------------------//
@@ -565,13 +532,9 @@ function climb_select(){
 function automatico(){
 
                 $.post('php/global.php', {name:"b",data:"beat"}, function(data){    //Beat de control de servidor activo
-                  $.post('php/global.php', {name:"number"},function(data1){   //get number of devices from db
-
                     if (data){  
                             $('div#name-data1').text("ONLINE"); //es el servidor
                             $("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
-
-                            
 
                                                  function modWeb(param, id) {
 
@@ -582,7 +545,9 @@ function automatico(){
 
                                                         $("div#name-data"+idplus).text(param);                                          
                                                 
-                                                        $("div#funciones").css("background-color",$("#body").css("background-color")); // cambio el color al mismo que body del fondo de div funciones 
+                                                        $("div#funciones").css("background-color",$("#top_down").css('backgroundColor'));
+
+                                                        //alert($("#top_down").css('backgroundColor'))
 
                                                         if (param == "online" || param == "ONLINE"){$("div#name-data"+idplus).css("color","#0B0"); }//cambio el colo a Verde si está online
                                                 
@@ -596,28 +561,41 @@ function automatico(){
 
                                                     }
                             
-                                        for (ki=1; ki<=data1; ki++) {
+                                        for (ki=1; ki<=devices_numbers; ki++) {
                                                 getDeviceStatus(ki, modWeb);
 
                                          };
                                     
                      } else {
-                    
-                            for (ki=1; ki<=data1+1; ki++) {     
+                    		
+                            for (ki=1; ki<=devices_numbers+1; ki++) {     
                                     $('div#name-data'+ki).text    ("Server off"); 
                                     $("div#name-data"+ki).css("color","#E00"); // cambio el color a Rojo si está offline
                                     $("div#funciones").css("background-color","#E00"); // cambio el color a Rojo si está offline del fondo de funciones
                                 }
                     }
-            });
-        });       
-            
-            
-    
+
+            });                   
 }
 
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
+
+function get_devices(){
+
+		$.post('php/global.php', {name:"number"},function(data){devices_numbers = data;});
+
+}
+
+
 function create_device_status_div(){
-        
+		
+       
         $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
                 
                 for (var i = 1; i <= data; i++) {
@@ -652,7 +630,7 @@ function create_device_status_div(){
 														    var currentId = $(this).attr('id');
 														    currentId ="get_tempo_"+currentId.substr(3);
 														    
-														   
+
 														    if  ($("#temporizador").css("display") == "block"){eval( currentId + '()' );$("#save2").hide("slow"); }
 
     														 
@@ -711,14 +689,57 @@ for (z = 1; z <= 3; z++){
                                                    }
                                                }
 
-// Configurar la importacion de los contadores de SQL
-
-
-
-
 //Funcion para saber que tipo de navegador se está utilizando.
-
 
 function deteccion(){
         return navigator.platform;
 }
+
+//---------------------------------------------------------------//
+//--------------Cambio de color de modo noche-------------------//
+
+$("#night").click(function(){
+    
+    if ($('body').css("background-color") == 'rgb(204, 204, 204)'){ 	//NOCHE
+            $("body").css("background-color", "#444141");
+            $("#top_down").css("background-color", "#515151");
+            $("#bottom").css("background-color", "#515151");
+            $("#dispositivos").css("background-color", "#515151");
+            $("#temporizador").css("background-color", "#515151");
+            $("#funciones").css("background-color", "#515151");
+            $(".per").css( "background-color", "#B1B1B1" );
+            $(".func").css( "background-color", "#B1B1B1" );
+            $(".boton_per").css( "background-color", "#B1B1B1" );
+          
+            
+
+            $("#night").css("background-color", "#A6A6A6");   
+    }else{																//DIA
+            $("body").css("background-color", "#CCCCCC");
+            $("#top_down").css("background-color", "#C2C2C2");
+            $("#bottom").css("background-color", "#C2C2C2");
+            $("#dispositivos").css("background-color", "#C2C2C2");
+            $("#temporizador").css("background-color", "#C2C2C2");
+            $("#funciones").css("background-color", "#C2C2C2");
+            $(".per").css( "background-color", "#DFDFDF" );
+            $(".func").css( "background-color", "#DFDFDF" );
+            $(".boton_per").css( "background-color", "#DFDFDF" );
+
+            $("#night").css("background-color", "#DFDFDF"); 
+    }
+        
+    
+});
+
+function comprobarHora(fecha){
+  var hora = fecha.getHours();
+  console.log(fecha.toLocaleTimeString()
+    + (hora>=10 && hora<20 ? ': dia' : ': noche'));
+
+  	if (hora<=10 && hora>20){$("#night").trigger("click");}
+}
+var d = new Date();
+comprobarHora(d);
+
+
+

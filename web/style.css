@@ -62,11 +62,11 @@ Informacion {visibility: hidden;}
 #boton_down{background-image:url("IMG/arrow-down-icon2.png"); background-size: 30px 30px;background-repeat: no-repeat;background-position: center;}
 #boton_st{background-image:url("IMG/stop-icon.png"); background-size: 30px 30px;background-repeat: no-repeat;background-position: center;}
 
-.per{background-size: 30px 30px; background-repeat: no-repeat; background-position: center; margin: 2px; background-color: #DFDFDF; width: 40px; height: 40px; text-align: center; float: left; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
-#per1{ background-image:url("IMG/television.png"); margin-left: 41px}
-#per2{ background-image:url("IMG/computer.png"); margin-left: 47px; background-size: 24px 27px}
+.per{background-size: 30px 30px; margin-left: 43px; margin-top: 10px; background-repeat: no-repeat; background-position: center;background-color: #DFDFDF; width: 40px; height: 40px; text-align: center; float: left; border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px; }
+#per1{ background-image:url("IMG/television.png");}
+#per2{ background-image:url("IMG/computer.png"); background-size: 24px 27px}
 #per3{ background-image:url("IMG/habitacion2.png"); margin-left: 47px}
-#persiana{margin-top: 20px}
+#persiana{margin-top: 10px}
 #div-conf-time1{margin-top: 25px}
 #sdiv-conf-time1{margin-top: 23px}
 

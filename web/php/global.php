@@ -71,7 +71,7 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
 		
 		if ( $_POST['name'] === "b" ) {		//Latido de server encendido
 			
-			send_server($_POST['data']);
+			send_server($_POST['data'],$_POST['data2'] );
 		}
                 
                 if ( $_POST['name'] === "pd" ) {
