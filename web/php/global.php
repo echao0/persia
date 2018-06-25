@@ -23,6 +23,12 @@
 //data2 =
 
 if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
+		if ( $_POST['name'] === "number" ) {
+			require 'conector.php';
+			$datos = new Table();
+			$estado = $datos->getAllInfo('number');
+			echo $estado [0]['MAX(id)'];
+		};
 		
 		if ( $_POST['name'] === "s" ) {
 			require 'conector.php';
@@ -65,7 +71,7 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
 		
 		if ( $_POST['name'] === "b" ) {		//Latido de server encendido
 			
-			send_server($_POST['data']);
+			send_server($_POST['data'],$_POST['data2'] );
 		}
                 
                 if ( $_POST['name'] === "pd" ) {
