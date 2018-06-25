@@ -158,14 +158,14 @@
                 <div id="dispositivos_titulo" class=" menu_general_titulo"> Dispositivos </div>
 				
 				<div id="disp_status">
-					<div id="disp-serv" class="dispositivo_top">Servidor :</div>
+					<div id="disp-serv" class="dispositivo_top">Server :</div>
 					<div id="name-data1" class="name-data">Cargando</div>	
 	            </div>                    
                 
                 <div id="config">
-                                   
+                    <div id="time-title">Time</div>             
                     <div id="conf-disp" class="conf-name">Servidor :</div>
-                    <div id="conf-ip0" class="conf-ip"><input id="conf-input0" type="text" class="conf-input" disabled></input></div>
+                    <div id="conf-ip0" class="conf-ip"> <input id="conf-input0" type="text" class="conf-input" disabled></input> <input id="conf-time0" class="conf-time" disabled="disabled" type="text"></div>
                 
                 </div>
                                 
