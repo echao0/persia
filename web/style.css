@@ -22,7 +22,7 @@ body {font-family:"Courier New", Courier, monospace;font-size: 13px;color: #0000
  .logout {float:right; font-size:6px; width:30px; padding-right:35px; padding-top:5px;}
  .dispositivo_top{float: left;width: 112px; height:20px; padding-top:0px;margin-left:30px;}
  .dispositivo{width: 112px; height:16px; padding-top:0px;margin-left:30px; float: left;}
- #disp_status{float: left; max-height: 50px; overflow: auto;}
+ #disp_status{float: left; max-height: 100px; overflow: auto;}
 
 /*+++++++ MAIN +++++++*/
 
@@ -68,6 +68,7 @@ Informacion {visibility: hidden;}
 #per2{ background-image:url("IMG/computer.png"); background-size: 24px 27px}
 #per3{ background-image:url("IMG/habitacion2.png"); margin-left: 47px}
 #per4{ background-image:url("IMG/light.png");}
+#night{background-size: 15px 15px;}
 
 #persiana{margin-top: 10px}
 #div-conf-time1{margin-top: 25px}
@@ -135,14 +136,19 @@ Informacion {visibility: hidden;}
 #Informacion { background-color: #C2C2C2}
 #config{ float:left; width: 309px; margin-top: 15px; border-top:1px  solid black; padding-top: 10px; overflow: auto;}
 
+/*+++++++++ Config ++++++++++++ */
+
+#time-title{margin-left: 240px;float: left;}
+
 /*+++++++++ Protec ++++++++++++ */
 #protec {width:250px; margin-left:auto; margin-right:auto; text-align:center; margin-top:7%; border: 1px solid black;}
 
 
 .name-data{ float:left; margin-left:39px; height: 20px; }
 .conf-ip{float: right; margin-right: 35px; margin-top: 6px}
-.conf-name{float: left; margin-left: 30px; margin-top: 10px}
+.conf-name{float: left; margin-left: 20px; margin-top: 10px}
 .conf-input{ float: left; width:100px; text-align: center; height: 13px;}
+.conf-time{ float: left; width:30px; text-align: center; height: 13px;}
 .boton_per{ padding: 10px ;background-color: #DFDFDF; float: left; margin-left:30px; margin-top: 10px; height: 40px; border:0px  solid black; text-align: center;  width: 40px;border-radius: 5px 5px 5px 5px;-moz-border-radius: 5px 5px 5px 5px;-webkit-border-radius: 5px 5px 5px 5px;}
 
 

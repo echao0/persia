@@ -93,7 +93,7 @@ $("#func1").click(function(){
     $("#persiana").hide("slow");
     $("#temporizador").hide("slow");
     
-    $("#dispositivos").css("height", "380px")
+    $("#dispositivos").css("max-height", "380px")
     $("#dispositivos").show("slow");
     $("#save2").hide("slow");
 });
@@ -478,21 +478,22 @@ function create_device_status_div(){
                 for (var i = 1; i <= data; i++) {
                     var o = i+1;
         //-------------------------------------------------------Devices status
-                    $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Dispositivo " +  i + ":",}).appendTo('#disp_status');
+                    $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Device " +  i + ":",}).appendTo('#disp_status');
                     $('<div/>', {id: 'name-data' + o,class: 'name-data',title: '',text: "Cargando",}).appendTo('#disp_status');
 
         //-------------------------------------------------------Devices IP
 
-                    $('<div/>', {id: 'conf-disp',class: 'conf-name',title: '',text: "Dispositivo " +  i + ":", }).appendTo('#config');
+                    $('<div/>', {id: 'conf-disp',class: 'conf-name',title: '',text: "Device " +  i + ":", }).appendTo('#config');
                     $('<div/>', {id: 'conf-ip'+i,class: 'conf-ip',title: '',}).appendTo('#config');
                     $('<input>', {type: 'text',id: 'conf-input'+i,class: 'conf-input',disabled: ""}).appendTo('#conf-ip'+i);
             }
 
                 for (var i = 1; i <= data; i++) {
         //-------------------------------------------------------Devices Move Time
-                    $('<div/>', {id: 'div-conf-time'+i,class: 'conf-name',title: '',text: "Tiempo mov " +  i + " :",}).appendTo('#config');        
+                    //$('<div/>', {id: 'div-conf-time'+i,class: 'conf-name',title: '',text: "Tiempo mov " +  i + " :",}).appendTo('#config');        
                     $('<div/>', {id: 'sdiv-conf-time'+i,class: 'conf-ip',title: '',}).appendTo('#config');
-                    $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-input',disabled: ""}).appendTo('#sdiv-conf-time'+i);
+                    //$('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-time',disabled: ""}).appendTo('#sdiv-conf-time'+i);
+                    $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-time',disabled: ""}).appendTo('#conf-ip'+i);
                    
 				    $('<div/>', {
 								    id: 'per'+i,
@@ -583,6 +584,7 @@ $("#night").click(function(){
             $(".per").css( "background-color", "#B1B1B1" );
             $(".func").css( "background-color", "#B1B1B1" );
             $(".boton_per").css( "background-color", "#B1B1B1" );
+            $('#night').css("background-image", "url(IMG/sun.png)")
           
             
 
@@ -597,6 +599,7 @@ $("#night").click(function(){
             $(".per").css( "background-color", "#DFDFDF" );
             $(".func").css( "background-color", "#DFDFDF" );
             $(".boton_per").css( "background-color", "#DFDFDF" );
+            $('#night').css("background-image", "url(IMG/moon.png)")
 
             $("#night").css("background-color", "#DFDFDF"); 
     }
@@ -609,7 +612,8 @@ function comprobarHora(fecha){
   console.log(fecha.toLocaleTimeString()
     + (hora>=10 && hora<20 ? ': dia' : ': noche'));
 
-  	if (hora<=10 && hora>20){$("#night").trigger("click");}
+  	if (hora<=10 && hora>20){$("#night").trigger("click"); $('#night').css("background-image", "url(IMG/sun.png)");}
+  	else{$('#night').css("background-image", "url(IMG/moon.png)")}
 }
 var d = new Date();
 comprobarHora(d);
