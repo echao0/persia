@@ -3,39 +3,7 @@
 
 var devices_numbers;
 
-
-
 //---------------------------------------------------------------//
-//--------------Cambio de color de icono persiana----------------//
-
-
-$("#per3").click(function(){
-    $("#per1").css("background-color", ""); 
-    $("#per2").css("background-color", "");
-    $("#per3").css("background-color", "#A6A6A6");
-    
-    //Añado todo lo que corresponde a timers
-    if  ($("#temporizador").css("display") == "block"){get_tempo_3();$("#save2").hide("slow"); }
-});
-
-$("#per2").click(function(){
-    $("#per1").css("background-color", ""); 
-    $("#per2").css("background-color", "#A6A6A6");
-    $("#per3").css("background-color", "");
-    
-    //Añado todo lo que corresponde a timers
-    if  ($("#temporizador").css("display") == "block"){get_tempo_2();$("#save2").hide("slow");}
-});
-
-$("#per1").click(function(){
-    $("#per1").css("background-color", "#A6A6A6"); 
-    $("#per2").css("background-color", "");
-    $("#per3").css("background-color", "");
-    
-    //Añado todo lo que corresponde a timers
- if  ($("#temporizador").css("display") == "block"){get_tempo_1();$("#save2").hide("slow");}
-    
-});
 
 $("#lock").click(function(){
     var color = $("#lock").css("background-color");
@@ -354,102 +322,11 @@ function get_days(i,z,t,data){
     
 }
 //Recuperar estado de los temporizadores
-function get_tempo_1(){   
-    //Rescatar todos los valores de subida dispositivo 1.
-    
-    
-    $.post('php/global.php', {name:"p" , disp:"1" , field:"hour", acc:"s"},function(data){
-        
-        
-        get_days(34,1,"s",data);                      //sacar datos de la configuración de los dias
-        get_days(160,2,"s",data);                      //sacar datos de la configuración de los dias
-        get_days(286,3,"s",data);                      //sacar datos de la configuración de los dias
-        
-        
-         if ((data.substring(103, 104) == 1 )){$('#check_1').prop("checked", "true")}else{$('#check_1').prop("checked","")} 
-         if ((data.substring(229, 230) == 1 )){$('#check_2').prop("checked", "true")}else{$('#check_2').prop("checked","")}
-         if ((data.substring(355, 356) == 1 )){$('#check_3').prop("checked", "true")}else{$('#check_3').prop("checked","")}
-         
-         if ((data.substring(123, 124) == 1 )){$('#checkS_1').prop("checked", "true")}else{$('#checkS_1').prop("checked","")} 
-         if ((data.substring(249, 250) == 1 )){$('#checkS_2').prop("checked", "true")}else{$('#checkS_2').prop("checked","")}
-         if ((data.substring(375, 376) == 1 )){$('#checkS_3').prop("checked", "true")}else{$('#checkS_3').prop("checked","")}
-       
-        $('#timepicker_s_1').val(data.substring(22, 27))              //Extraigo la hora y asigno a textbox
-        $('#timepicker_s_2').val(data.substring(148, 153))            //Extraigo la hora y asigno a textbox
-        $('#timepicker_s_3').val(data.substring(274, 279))            //Extraigo la hora y asigno a textbox
-        
-        })
-     
-    //Rescatar todos los valores de bajada dispositivo 1
-    $.post('php/global.php', {name:"p" , disp:"1" , field:"hour", acc:"b"},function(data){
-       
-        get_days(34,1,"b",data);                      //sacar datos de la configuración de los dias
-        get_days(160,2,"b",data);                      //sacar datos de la configuración de los dias
-        get_days(286,3,"b",data);                      //sacar datos de la configuración de los dias
-        
-        if ((data.substring(103, 104) == 1 )){$('#check_4').prop("checked", "true")}else{$('#check_4').prop("checked","")}
-        if ((data.substring(229, 230) == 1 )){$('#check_5').prop("checked", "true")}else{$('#check_5').prop("checked","")}
-        if ((data.substring(355, 356) == 1 )){$('#check_6').prop("checked", "true")}else{$('#check_6').prop("checked","")}
-        
-         if ((data.substring(123, 124) == 1 )){$('#checkS_4').prop("checked", "true")}else{$('#checkS_4').prop("checked","")} 
-         if ((data.substring(249, 250) == 1 )){$('#checkS_5').prop("checked", "true")}else{$('#checkS_5').prop("checked","")}
-         if ((data.substring(375, 376) == 1 )){$('#checkS_6').prop("checked", "true")}else{$('#checkS_6').prop("checked","")}
-        
-        $('#timepicker_b_1').val(data.substring(22, 27))            //Extraigo la hora y asigno a textbox
-        $('#timepicker_b_2').val(data.substring(148, 153))            //Extraigo la hora y asigno a textbox
-        $('#timepicker_b_3').val(data.substring(274, 279))            //Extraigo la hora y asigno a textbox
-        })
-    }
 
-function get_tempo_2(){   
+    function get_tempo_(id){   
     //Rescatar todos los valores de subida dispositivo 1.
    
-    
-    $.post('php/global.php', {name:"p" , disp:"2" , field:"hour", acc:"s"},function(data){
-        
-        get_days(34,1,"s",data);                      //sacar datos de la configuración de los dias
-        get_days(160,2,"s",data);                      //sacar datos de la configuración de los dias
-        get_days(286,3,"s",data);                      //sacar datos de la configuración de los dias
-        
-         if ((data.substring(103, 104) == 1 )){$('#check_1').prop("checked", "true")}else{$('#check_1').prop("checked","")}
-         if ((data.substring(229, 230) == 1 )){$('#check_2').prop("checked", "true")}else{$('#check_2').prop("checked","")}
-         if ((data.substring(355, 356) == 1 )){$('#check_3').prop("checked", "true")}else{$('#check_3').prop("checked","")}
-         
-         if ((data.substring(123, 124) == 1 )){$('#checkS_1').prop("checked", "true")}else{$('#checkS_1').prop("checked","")} 
-         if ((data.substring(249, 250) == 1 )){$('#checkS_2').prop("checked", "true")}else{$('#checkS_2').prop("checked","")}
-         if ((data.substring(375, 376) == 1 )){$('#checkS_3').prop("checked", "true")}else{$('#checkS_3').prop("checked","")}
-         
-       
-        $('#timepicker_s_1').val(data.substring(22, 27))              //Extraigo la hora y asigno a textbox
-        $('#timepicker_s_2').val(data.substring(148, 153))            //Extraigo la hora y asigno a textbox
-        $('#timepicker_s_3').val(data.substring(274, 279))            //Extraigo la hora y asigno a textbox
-        })
-     
-    //Rescatar todos los valores de bajada dispositivo 1
-    $.post('php/global.php', {name:"p" , disp:"2" , field:"hour", acc:"b"},function(data){
-        
-        get_days(34,1,"b",data);                      //sacar datos de la configuración de los dias
-        get_days(160,2,"b",data);                      //sacar datos de la configuración de los dias
-        get_days(286,3,"b",data);                      //sacar datos de la configuración de los dias
-        
-        if ((data.substring(103, 104) == 1 )){$('#check_4').prop("checked", "true")}else{$('#check_4').prop("checked","")}
-        if ((data.substring(229, 230) == 1 )){$('#check_5').prop("checked", "true")}else{$('#check_5').prop("checked","")}
-        if ((data.substring(355, 356) == 1 )){$('#check_6').prop("checked", "true")}else{$('#check_6').prop("checked","")}
-        
-        if ((data.substring(123, 124) == 1 )){$('#checkS_4').prop("checked", "true")}else{$('#checkS_4').prop("checked","")} 
-        if ((data.substring(249, 250) == 1 )){$('#checkS_5').prop("checked", "true")}else{$('#checkS_5').prop("checked","")}
-        if ((data.substring(375, 376) == 1 )){$('#checkS_6').prop("checked", "true")}else{$('#checkS_6').prop("checked","")}
-        
-        $('#timepicker_b_1').val(data.substring(22, 27))            //Extraigo la hora y asigno a textbox
-        $('#timepicker_b_2').val(data.substring(148, 153))            //Extraigo la hora y asigno a textbox
-        $('#timepicker_b_3').val(data.substring(274, 279))            //Extraigo la hora y asigno a textbox
-        })
-    }
- 
- function get_tempo_3(){   
-    //Rescatar todos los valores de subida dispositivo 1.
-    
-    $.post('php/global.php', {name:"p" , disp:"3" , field:"hour", acc:"s"},function(data){
+    $.post('php/global.php', {name:"p" , disp:id , field:"hour", acc:"s"},function(data){
         
         get_days(34,1,"s",data);                      //sacar datos de la configuración de los dias
         get_days(160,2,"s",data);                      //sacar datos de la configuración de los dias
@@ -469,7 +346,7 @@ function get_tempo_2(){
         })
      
     //Rescatar todos los valores de bajada dispositivo 1
-    $.post('php/global.php', {name:"p" , disp:"3" , field:"hour", acc:"b"},function(data){
+    $.post('php/global.php', {name:"p" , disp:id , field:"hour", acc:"b"},function(data){
         
         get_days(34,1,"b",data);                      //sacar datos de la configuración de los dias
         get_days(160,2,"b",data);                      //sacar datos de la configuración de los dias
@@ -531,51 +408,51 @@ function climb_select(){
 
 function automatico(){
 
-                $.post('php/global.php', {name:"b",data:"beat"}, function(data){    //Beat de control de servidor activo
-                    if (data){  
-                            $('div#name-data1').text("ONLINE"); //es el servidor
-                            $("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
+        $.post('php/global.php', {name:"b",data:"beat"}, function(data){    //Beat de control de servidor activo
+            if (data){  
+                $('div#name-data1').text("ONLINE"); //es el servidor
+                $("div#name-data1").css("color","#0B0"); //cambio el colo a Verde si está online
 
-                                                 function modWeb(param, id) {
+	            function modWeb(param, id) {
 
-                                                        //console.log(id);
-                                                        //console.log(param);
-                                                        
-                                                        var idplus= id +1;
+	                    //console.log(id);
+	                    //console.log(param);
+	                    
+	                    var idplus= id +1;
 
-                                                        $("div#name-data"+idplus).text(param);                                          
-                                                
-                                                        $("div#funciones").css("background-color",$("#top_down").css('backgroundColor'));
+	                    $("div#name-data"+idplus).text(param);                                          
+	            
+	                    $("div#funciones").css("background-color",$("#top_down").css('backgroundColor'));
 
-                                                        //alert($("#top_down").css('backgroundColor'))
+	                    //alert($("#top_down").css('backgroundColor'))
 
-                                                        if (param == "online" || param == "ONLINE"){$("div#name-data"+idplus).css("color","#0B0"); }//cambio el colo a Verde si está online
-                                                
-                                                        if (param == "offline" || param == "OFFLINE"){$("div#name-data"+idplus).css("color","#E00"); }// cambio el color a Rojo si está offline    
+	                    if (param == "online" || param == "ONLINE"){$("div#name-data"+idplus).css("color","#0B0"); }//cambio el colo a Verde si está online
+	            
+	                    if (param == "offline" || param == "OFFLINE"){$("div#name-data"+idplus).css("color","#E00"); }// cambio el color a Rojo si está offline    
 
-                                                 }
+	            }
 
-                                                 function getDeviceStatus(id, callback){
-                                                        $.post('php/global.php', {name:"s" , disp:id}, function(data1){
-                                                        callback(data1, id);});
+	            function getDeviceStatus(id, callback){
+	                    $.post('php/global.php', {name:"s" , disp:id}, function(data1){
+	                    callback(data1, id);});
 
-                                                    }
+	             }
+                
+                for (ki=1; ki<=devices_numbers; ki++) {
+                        getDeviceStatus(ki, modWeb);
+
+                 };
                             
-                                        for (ki=1; ki<=devices_numbers; ki++) {
-                                                getDeviceStatus(ki, modWeb);
+             } else {
+            		
+                    for (ki=1; ki<=devices_numbers+1; ki++) {     
+                            $('div#name-data'+ki).text    ("Server off"); 
+                            $("div#name-data"+ki).css("color","#E00"); // cambio el color a Rojo si está offline
+                            $("div#funciones").css("background-color","#E00"); // cambio el color a Rojo si está offline del fondo de funciones
+                        }
+            }
 
-                                         };
-                                    
-                     } else {
-                    		
-                            for (ki=1; ki<=devices_numbers+1; ki++) {     
-                                    $('div#name-data'+ki).text    ("Server off"); 
-                                    $("div#name-data"+ki).css("color","#E00"); // cambio el color a Rojo si está offline
-                                    $("div#funciones").css("background-color","#E00"); // cambio el color a Rojo si está offline del fondo de funciones
-                                }
-                    }
-
-            });                   
+    });                   
 }
 
 function wait(ms){
@@ -621,26 +498,22 @@ function create_device_status_div(){
 								    id: 'per'+i,
 								    class: 'per',click: function(){
 								    						
-    														
-														    $('div[id ^= per]').css("background-color", ""); 
-														   
-														    $(this).css("background-color", "#A6A6A6");
-														    
-														    //Añado todo lo que corresponde a timers
-														    var currentId = $(this).attr('id');
-														    currentId ="get_tempo_"+currentId.substr(3);
-														    
+									    $('div[id ^= per]').css("background-color", ""); 
+									   
+									    $(this).css("background-color", "#A6A6A6");
+									    
+									    //Añado todo lo que corresponde a timers
+									   var call_func = "get_tempo_";
+									   var currentId = $(this).attr('id');
 
-														    if  ($("#temporizador").css("display") == "block"){eval( currentId + '()' );$("#save2").hide("slow"); }
+									   if  ($("#temporizador").css("display") == "block"){eval( call_func + '('+ currentId.substr(3)+')' );$("#save2").hide("slow"); }
 
-    														 
-
-    														}
+    								}
 								    
-								}).appendTo('#persiana');
-            }
+					}).appendTo('#persiana');
+            	}
         })
-    }  
+}  
 	
 //---------------------------------------------------------------//
 //Enviar los datos a pagina PHP que se lo envía al servidor.
