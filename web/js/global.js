@@ -610,10 +610,10 @@ $("#night").click(function(){
 function comprobarHora(fecha){
   var hora = fecha.getHours();
   console.log(fecha.toLocaleTimeString()
-    + (hora>=10 && hora<20 ? ': dia' : ': noche'));
+    + (hora>=10 && hora<19 ? ': dia' : ': noche'));
 
-  	if (hora<=10 && hora>20){$("#night").trigger("click"); $('#night').css("background-image", "url(IMG/sun.png)");}
-  	else{$('#night').css("background-image", "url(IMG/moon.png)")}
+  	if (hora>=10 && hora<19){$('#night').css("background-image", "url(IMG/moon.png)")}
+  	else{$("#night").trigger("click"); $('#night').css("background-image", "url(IMG/sun.png)")}
 }
 var d = new Date();
 comprobarHora(d);
