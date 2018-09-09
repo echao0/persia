@@ -128,13 +128,14 @@ function send_server($output,$output2){
 			$buf = True;
 
 			if (false !== ($bytes = socket_recv($socket1, $buf, 2048, MSG_WAITALL))) {
-				echo "$bytes bytes desde socket_recv().\n";
+				#echo "$bytes bytes desde socket_recv().\n";
+				echo $buf; //Respuesta que envio (1 correcto , 0 error )a global.js send_server()
 			} else {
 				echo "socket_recv() falló; razón: " . socket_strerror(socket_last_error($socket)) . "\n";
 			}
 			socket_close($socket);
 
-			echo "\n" . $buf . "\n";
+			#echo "\n" . "Comando y DevNum: " . $output . " " . $buf . "\n";
 
 			socket_close($socket1) ;
 }

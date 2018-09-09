@@ -368,16 +368,16 @@ class ServerHandler(SocketServer.BaseRequestHandler):
                 print "Accion: " + datos[0]
 
             if datos[0] == "abajo":
-                self.request.send(str("Bajando"))
-                disp[str(datos[1])].comm("b")
+                resp = disp[str(datos[1])].comm("b")
+                self.request.send(str(resp))
 
             if datos[0] == "Subir":
-                self.request.send(str("Subiendo"))
-                disp[str(datos[1])].comm("s")
+                resp = disp[str(datos[1])].comm("s")
+                self.request.send(str(resp))
 
             if datos[0] == "stop":
-                self.request.send(str("Paro"))
-                disp[str(datos[1])].comm("z")
+                resp = disp[str(datos[1])].comm("z")
+                self.request.send(str(resp))
 
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))

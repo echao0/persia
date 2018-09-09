@@ -528,7 +528,12 @@ function send_server($data, $data2){
 	if (($valor1 != '') && ($valor2) )   {                                  //compruebo que mando acción y persiana para evitar problemas
            
 			$.post('php/global.php', {name:"t",data:$valor1,data2:$valor2}, function(data){ 	//Llamo a la funcion PHP pasando los valores por post
-			$('#ack').html(data);											//Enseño el resultado
+														
+				if(data != 1){					//Color rojo en fallo de envio a DEV
+
+					$('div#per'+$data2).css("background-color", "#E00");
+					$('#ack').html("error enviando a: " + $data2); 
+			      } else { $('#ack').html(data);}
 			
 		});
 	} else {
