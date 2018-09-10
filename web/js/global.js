@@ -532,8 +532,8 @@ function send_server($data, $data2){
 				if(data != 1){					//Color rojo en fallo de envio a DEV
 
 					$('div#per'+$data2).css("background-color", "#E00");
-					$('#ack').html("error enviando a: " + $data2); 
-			      } else { $('#ack').html(data);}
+					$('#ack').html("Error sending to device: " + $data2); 
+			      } else { $('#ack').html("Device: " + $data2 + " - Order: " + $valor1 + " - Answer: " + data );}
 			
 		});
 	} else {
