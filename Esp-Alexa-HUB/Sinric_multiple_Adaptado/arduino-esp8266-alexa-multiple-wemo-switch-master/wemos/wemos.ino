@@ -1,4 +1,4 @@
-//https://github.com/kakopappa/arduino-esp8266-alexa-multiple-wemo-switch
+//THANKS - https://github.com/kakopappa/arduino-esp8266-alexa-multiple-wemo-switch
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
