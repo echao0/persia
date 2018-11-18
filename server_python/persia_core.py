@@ -51,7 +51,7 @@ python_args = parser.parse_args()
 port = 5000  # Devices default comunication port
 
 # ------- Configuration Python Server ---------- #
-server_host = '127.0.0.1'
+server_host = ''
 server_port = int(2000)  # Server socket to comunicate to webpage
 server_on = True  # Variable de control de flujo
 working = False  # variable para control pila de salida ardu_out
