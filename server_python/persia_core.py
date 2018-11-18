@@ -385,7 +385,7 @@ class ServerHandler(SocketServer.BaseRequestHandler):
 
             if datos[0] == "server":
                 self.request.send(str("Apagando el servidor"))
-                os.system("ssh -i /home/pi/.ssh/id_rsa.pub echao@192.168.3.151 'sudo shutdown -r now'")
+                os.system("ssh echao@192.168.3.151 'sudo shutdown -r now'")
 
             if not disp[str(datos[1])].get_infi():          #If not a infinite device, start timer to automatically stop
                 timers[str(datos[1])].start()
