@@ -11,8 +11,9 @@
 boolean connectWifi();
 
 //on/off callbacks 
-bool serverLightsOn();
-bool serverLightsOff();
+bool servidorLightsOn();
+bool servidorLightsOff();
+
 bool kitchenLightsOn();
 bool kitchenLightsOff();
 
@@ -31,8 +32,6 @@ bool persiana3Off();
 //------------Local Outputs -----------------------
 
 char out1 = D1;
-
-
 char outON = LOW;
 char outOFF = HIGH;
 
@@ -46,8 +45,6 @@ char outOFF = HIGH;
     WiFiClient client;
 //-------------------------------------------------
 
-
-
 // Change this before you flash
 const char* ssid = "Me-House";
 const char* password = "Et-micasa";
@@ -56,22 +53,24 @@ boolean wifiConnected = false;
 
 UpnpBroadcastResponder upnpBroadcastResponder;
 
-Switch *server = NULL;
+Switch *servidor = NULL;
 Switch *kitchen = NULL;
-
 Switch *lampara = NULL;
 Switch *persiana1 = NULL;
 Switch *persiana2 = NULL;
 Switch *persiana3 = NULL;
 
-bool isserverLightsOn = false;
+bool isservidorLightsOn = false;
 bool isKitchenLightstsOn = false;
-
 bool islamparaLightstsOn = false;
 bool ispersiana1LightstsOn = false;
 bool ispersiana2LightstsOn = false;
 bool ispersiana3LightstsOn = false;
 
+//-----Variables para temporizador de apagado server --------//
+unsigned long timer = 0;
+boolean timerConnect = false;
+//-------------------------------------------------------------
 
 void setup()
 {
@@ -79,7 +78,7 @@ void setup()
   
   pinMode(out1, OUTPUT);
   digitalWrite(out1, outOFF);
-   
+  
   // Initialise wifi connection
   wifiConnected = connectWifi();
   
@@ -88,8 +87,8 @@ void setup()
     
     // Define your switches here. Max 10
     // Format: Alexa invocation name, local port no, on callback, off callback
-    server = new Switch("Server", 80, serverLightsOn, serverLightsOff);
-    kitchen = new Switch("Quieto", 81, kitchenLightsOn, kitchenLightsOff);
+    servidor = new Switch("servidor", 80, servidorLightsOn, servidorLightsOff);
+    kitchen = new Switch("quieto", 81, kitchenLightsOn, kitchenLightsOff);
     
     lampara = new Switch("lampara", 82, lamparaOn, lamparaOff);
     persiana1 = new Switch("persiana 1", 83, persiana1On, persiana1Off);
@@ -98,9 +97,8 @@ void setup()
     
 
     Serial.println("Adding switches upnp broadcast responder");
-    upnpBroadcastResponder.addDevice(*server);
+    upnpBroadcastResponder.addDevice(*servidor);
     upnpBroadcastResponder.addDevice(*kitchen);
-    
     upnpBroadcastResponder.addDevice(*lampara);
     upnpBroadcastResponder.addDevice(*persiana1);
     upnpBroadcastResponder.addDevice(*persiana2);
@@ -114,320 +112,170 @@ void loop()
       upnpBroadcastResponder.serverLoop();
       
       kitchen->serverLoop();
-      server->serverLoop();
-      
+      servidor->serverLoop();
       lampara->serverLoop();
       persiana1->serverLoop();
       persiana2->serverLoop();
       persiana3->serverLoop();
       
 	 }
-}
-bool lamparaOn() {    
-    islamparaLightstsOn = true;  
+//-------Temporizador apagar server ------- //
+//------------------------------------------//   
+
+   if ((timerConnect) and (millis() > timer + 25000 )  ){
+       digitalWrite(out1, outOFF);
+       timerConnect = false;
+    }
     
-          //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          
+ //------------------------------------------//
+//------------------------------------------//
+
+}
+
+ //------------------------------------------//
+ //FUNCIONES
+//------------------------------------------//
+
+
+bool lamparaOn() {    
+
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("Subir,4");
           client.stop();
-          
-          //-------------------------------------------------
-            
+
+           islamparaLightstsOn = true;        
     return islamparaLightstsOn;
 }
 
 bool lamparaOff() {
-    islamparaLightstsOn = false;
 
-          //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
+          if (!client.connect(host, port)) { delay(1000);}
     
           client.print("stop,4");
           client.stop();
 
-          //-------------------------------------------------
-    
+           islamparaLightstsOn = false;
     return islamparaLightstsOn;
 }
 
 bool persiana1On() {
-    Serial.println("Switch persiana1 turn on ...");
-    
-    ispersiana1LightstsOn = true;  
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("Subir,1");
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
           client.stop();
           
-          //-------------------------------------------------  
+           ispersiana1LightstsOn = true;
     return ispersiana1LightstsOn;
 }
 
 bool persiana1Off() {
-    Serial.println("Switch persiana 1 turn off ...");
-
-    ispersiana1LightstsOn = false;
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+  
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("abajo,1");
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
           client.stop();
           
-          //-------------------------------------------------
+           ispersiana1LightstsOn = false;
     return ispersiana1LightstsOn;
 }
 
 bool persiana2On() {
-    Serial.println("Switch persiana 2 turn on ...");
-    
-    ispersiana2LightstsOn = true; 
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
           
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("Subir,2");
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
           client.stop();
           
-          //-------------------------------------------------   
+           ispersiana2LightstsOn = true; 
     return ispersiana2LightstsOn;
 }
 
 bool persiana2Off() {
-    Serial.println("Switch persiana 2 turn off ...");
 
-    ispersiana2LightstsOn = false;
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("abajo,2");
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
           client.stop();
           
-          //-------------------------------------------------
+           ispersiana2LightstsOn = false;
     return ispersiana2LightstsOn;
 }
 
 bool persiana3On() {
-    Serial.println("Switch persiana 3 turn on ...");
-    
-    ispersiana3LightstsOn = true;   
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+  
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("Subir,3");
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
           client.stop();
           
-          //------------------------------------------------- 
+           ispersiana3LightstsOn = true; 
     return ispersiana3LightstsOn;
 }
 
 bool persiana3Off() {
-    Serial.println("Switch persiana 3 turn off ...");
-
-    ispersiana3LightstsOn = false;
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+  
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("abajo,3");
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
           client.stop();
           
-          //-------------------------------------------------
+           ispersiana3LightstsOn = false;
     return ispersiana3LightstsOn;
 }
 
 
-bool serverLightsOn() {
-    Serial.println("Switch 1 turn on ...");
+bool servidorLightsOn() {
 
     digitalWrite(out1, outON);
+    timerConnect = false;
     
-    isserverLightsOn = true;    
-    return isserverLightsOn;
+           isservidorLightsOn = true;    
+    return isservidorLightsOn;
 }
 
-bool serverLightsOff() {
-    Serial.println("Servidor 1 turn off ...");
+bool servidorLightsOff() {
+    Serial.println("dentro de OFF SERVER");
     
-    if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-              
-    client.print("server,4"); 
+    if (!client.connect(host, port)) {delay(1000);}        
+    client.print("server,4"); //mando paquete apagado SSH
+    client.stop();
     
-    delay(60000);     //dar tiempo para que se apage el sistema
-    digitalWrite(out1, outOFF);
+    timer = millis();
+    timerConnect = true;
     
-    isserverLightsOn = false;
-    return isserverLightsOn;
+           isservidorLightsOn = false;
+    return isservidorLightsOn;
 }
 
 bool kitchenLightsOn() {
-    Serial.println("Switch 2 turn on ...");
-    //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+      
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("stop,1");
           client.stop();
 
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("stop,2");
           client.stop();
 
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          
+          if (!client.connect(host, port)) {delay(1000);}
           client.print("stop,3");
           client.stop();
-          
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
-   
-          
-          //-------------------------------------------------
 
-    isKitchenLightstsOn = true;
+           isKitchenLightstsOn = true;
     return isKitchenLightstsOn;
 }
 
 bool kitchenLightsOff() {
-  Serial.println("Switch 2 turn off ...");
-
-  isKitchenLightstsOn = false;
-  //-------------------------------------------------
-          //-------Modificado para TCP-----------------------
-          
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          Serial.println("Conectado a persia");
-          
+  
+          if (!client.connect(host, port)) {delay(500);}
           client.print("stop,1");
           client.stop();
 
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
-          
+          if (!client.connect(host, port)) {delay(500);}
           client.print("stop,2");
           client.stop();
 
-          if (!client.connect(host, port)) {
-                  Serial.println("connection failed");
-                  Serial.println("wait 5 sec...");
-                  delay(1000);
-              }
+          if (!client.connect(host, port)) {delay(500);}
           
           client.print("stop,3");
           client.stop();
           
-          
-          Serial.println("El paquete se ha enviado");
-          
-          Serial.println("closing connection");
-   
-          
-          //-------------------------------------------------
+         isKitchenLightstsOn = false;
   return isKitchenLightstsOn;
 }
 
