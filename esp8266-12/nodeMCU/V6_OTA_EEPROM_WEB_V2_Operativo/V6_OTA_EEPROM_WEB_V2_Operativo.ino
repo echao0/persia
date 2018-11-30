@@ -15,6 +15,7 @@ IPAddress subnet(0,0,0,0); // set subnet mask to match your
 
 WiFiServer server(5000);
 
+int tempPin= A0;
 char outS = D1;
 char outB = D2;
 char alto = LOW;
@@ -68,6 +69,7 @@ Serial.print("Gateway del terminal: ");
 Serial.println(gateway);
 
  //-----------IN/OUT------------
+  
   pinMode(2, OUTPUT);
   digitalWrite(2, LOW);
  
@@ -335,6 +337,16 @@ void loop() {
       accion = 0;                    //Cambio la variable a paro
       client.println("1");
     }
+
+   if (linea1 == "t" ) {
+        int analogValue = analogRead(tempPin);
+        //float millivolts = (analogValue/1024.0) * 3300; //3300 is the voltage provided by NodeMCU
+        //float celsius = millivolts/10;
+        Serial.print("Valor Leido=   ");
+        Serial.println(analogValue);
+        client.println(analogValue);
+    }
+    
 
     client.flush();
     // client.println("Connection: close");
