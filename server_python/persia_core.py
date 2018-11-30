@@ -379,6 +379,10 @@ class ServerHandler(SocketServer.BaseRequestHandler):
                 resp = disp[str(datos[1])].comm("z")
                 self.request.send(str(resp))
 
+            if datos[0] == "temp":
+                resp = disp[str(datos[1])].comm("t")
+                self.request.send(str(resp))
+
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
                 devices_timers();
