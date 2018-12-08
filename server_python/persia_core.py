@@ -415,7 +415,7 @@ class miserver():
         try:
             server = SocketServer.TCPServer((server_host, server_port), ServerHandler)  # Creo el objeto servidor
             server.socket.settimeout(
-                1.0)  # Selecciono un timeout del servidor de 5 segundos (evito fallo de cierre de server)
+                3.0)  # Selecciono un timeout del servidor de 5 segundos (evito fallo de cierre de server)
 
             while server_on:  # Control de variable de cierre de hilo principal
                 server.handle_request()
