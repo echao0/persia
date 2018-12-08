@@ -198,13 +198,18 @@ def update():
 
 class Device():
 
-    def __init__(self, name, ip, wtime, id, infi=False):
+    def __init__(self, name, ip, wtime, id, infi=False, heatingReachTemp=0, heatingActTemp = 0, heatingStayTemp=False, heatingOn=False, hetingFullOff=False):
         self.name = name
         self.ip = ip
         self.wtime = wtime
         self.infi = infi  # never stop automatically
         self.id = id
         self.status = "offline"  # It's online or offline
+        self.heatingReachTemp = heatingReachTemp
+        self.heatingActTemp = heatingActTemp
+        self.heatingStayTemp = heatingStayTemp
+        self.heatingOn = heatingOn
+        self.hetingFullOff = hetingFullOff
 
         if python_args.verbose:
             print "id------------ : " + self.id
@@ -252,7 +257,22 @@ class Device():
     def set_id(self, new_id):
         self.id = new_id
 
-        # ------Gemeral functions --------------------------------------
+    def set_heatingReachTemp(self, data):
+        self.heatingReachTemp = data
+
+    def heatingActTemp(self, data):
+        self.heatingActTemp = data
+
+    def heatingStayTemp(self, data):
+        self.heatingStayTemp = data
+
+    def heatingOn(self, data):
+        self.heatingOn = data
+
+    def hetingFullOff(self, data):
+        self.hetingFullOff = data
+
+# ------General functions --------------------------------------
 
     def comm(self, data):
 
