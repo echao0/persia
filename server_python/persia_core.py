@@ -200,16 +200,17 @@ class Heating():
 
 #Require class timer()
 
-    heatingReachTemp = 22    #Temperatura que debe de alcanzar antes de apagar
+    heatingReachTemp = 24    #Temperatura que debe de alcanzar antes de apagar
     heatingActTemp = 0      #Temperatura interior actual
     heatingStayTemp = False #Mantener encendido al alcanzar la temperatura
     heatingOn = False       #Esta heating encendido o apagado?
     hetingFullOff = False   #apagar el controlador manual?
 
     name = False  # Nombre asignado al heating
-    heatingDisp = 4  # Variable que indica que ip tiene el dispositivo a controlar salida
-    tempDisp = 4    #Variable con la id del dispositivo que tiene el termometro
+    heatingDisp = "4"  # Variable que indica que ip tiene el dispositivo a controlar salida
+    tempDisp = "4"    #Variable con la id del dispositivo que tiene el termometro
     status = False  # Variable para saber estado del heating (trabajando o no)
+    disp = False
 
     global python_args
 
@@ -236,6 +237,13 @@ class Heating():
         if python_args.verbose:
             print "El heating: " + self.name + " ha sido destruido"
 
+    def get_temp(self):
+        millivolts = (float(disp[self.tempDisp].comm("t")) / 1024.0) * 3300;
+        celsius = millivolts / 10
+        celsius = celsius
+        celsius = celsius - 2
+        return celsius
+
     def start2(self):
         if (self.status == False):
             t = threading.Thread(target=self.heating_start)
@@ -248,25 +256,23 @@ class Heating():
         if self.status == False :
 
             self.status = True
-            self.heatingActTemp = disp[self.tempDisp].comm("t") #Saber la temperatura actual.
+            self.heatingActTemp = self.get_temp() #Saber la temperatura actual.
             disp[self.heatingDisp].comm("s")   #Activo la output de encendido
 
-            heatingT = Timer()
-            heatingT.name = "heating"  # Timer for online pulse
-            heatingT.wtime = 10
-            heatingT.beat = True  # Activate infinite counter
-            heatingT.start()
 
     def heating_timer_control(self):
 
-                self.heatingActTemp = disp[self.tempDisp].comm("t")  # Saber la temperatura actual.
-                print "La temperatura actual es: " + self.heatingActTemp
+                self.heatingActTemp = self.get_temp()  # Saber la temperatura actual.
+                print "La temperatura actual es: "
+                print self.heatingActTemp
 
                 if self.heatingActTemp >= self.heatingReachTemp:
                     disp[self.heatingDisp].comm("z")
-                    print "Se ha alcanzado la temperatura deseada"
+                    print "Se ha alcanzado la temperatura leida: "
+                    print self.heatingActTemp
 
-                    if heatingStayTemp == False:
+                    if self.heatingStayTemp == False:
+                        print "destrullo el objeto temp"
                         del (heatingT)
                         self.status = False
 
@@ -655,6 +661,13 @@ def timer_auto_lanza(matriz):  # saber con la matriz de timer_auto() si es la ho
 
                 disp[str(matriz[i][0])].comm(str(matriz[i][8]))  # Send command to device
 
+def timer_heating():
+    print "dentro de timer heating"
+    heatingT = Timer()
+    heatingT.name = "latido"  # Timer for online pulse
+    heatingT.wtime = 10
+    heatingT.beat = True  # Activate infinite counter
+    heatingT.start()
 
 # ----------- Program Start ---------#
 # -----------------------------------#
@@ -695,8 +708,15 @@ timerAutomove.wtime = 60
 timerAutomove.beat = True  # Activate infinite counter
 timerAutomove.start()
 
+heatingT = Timer()
+heatingT.name = "heating"  # Timer for online pulse
+heatingT.wtime = 15
+heatingT.beat = True  # Activate infinite counter
+heatingT.start()
+
 heating = Heating()     #Creo el heating
 heating.start()
+
 
 # ---------------------------------------------------------------------------------------
 
@@ -723,11 +743,10 @@ try:
 
             timerLatido.set_trigger(False)
 
-        try:
             if heatingT.get_trigger() == True:
+                print "dentro de control"
                 heating.heating_timer_control()
-        except:
-            print "no he podido llamar a heatingT porque no existe"
+                heatingT.set_trigger(False)
 
         time.sleep(sleep_time)
 
