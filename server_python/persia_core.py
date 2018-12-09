@@ -208,7 +208,7 @@ class Heating():
     hetingFullOff = False   #apagar el controlador manual?
 
     name = False  # Nombre asignado al heating
-    heatingDisp = "4"  # Variable que indica que ip tiene el dispositivo a controlar salida
+    heatingDisp = "5"  # Variable que indica que ip tiene el dispositivo a controlar salida
     tempDisp = "4"    #Variable con la id del dispositivo que tiene el termometro
 
     disp = False
@@ -282,7 +282,8 @@ class Heating():
         disp[self.heatingDisp].comm("b")
 
     def heating_timer_control(self):
-        print "dentro de control de heating"
+        if python_args.verbose:
+            print "dentro de control de heating"
         if self.heatingOn == True:
             self.heatingActTemp = self.get_temp()  # Saber la temperatura actual.
             if python_args.verbose:
