@@ -262,8 +262,12 @@ class Heating():
     def raise_Temp(self, temp):
         if python_args.verbose:
             print "Alcanzar la temperatura encendido raise_Temp"
-        self.heatingReachTemp = temp
+        self.heatingActTemp = self.get_temp()
+        self.heatingReachTemp = self.heatingActTemp + temp
         self.heatingStayTemp = False
+        if python_args.verbose:
+            print "temperatura a alcanzar "
+            print self.heatingReachTemp
         self.start()
 
     def heating_stay(self, temp):
