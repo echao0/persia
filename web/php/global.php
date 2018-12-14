@@ -113,7 +113,7 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
 }
 
 function send_server($output,$output2){
-    
+	
                         if ($output2){$output = $output .",". $output2;}
                                 
 			$host = "127.0.0.1";
@@ -130,6 +130,7 @@ function send_server($output,$output2){
 			if (false !== ($bytes = socket_recv($socket1, $buf, 2048, MSG_WAITALL))) {
 				#echo "$bytes bytes desde socket_recv().\n";
 				echo $buf; //Respuesta que envio (1 correcto , 0 error )a global.js send_server()
+				
 			} else {
 				echo "socket_recv() falló; razón: " . socket_strerror(socket_last_error($socket)) . "\n";
 			}
@@ -138,5 +139,6 @@ function send_server($output,$output2){
 			#echo "\n" . "Comando y DevNum: " . $output . " " . $buf . "\n";
 
 			socket_close($socket1) ;
+			
 }
 ?>

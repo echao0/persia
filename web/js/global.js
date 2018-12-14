@@ -2,6 +2,7 @@
 //---------------------------------------------------------------//
 
 var devices_numbers;
+var tempera;
 
 //---------------------------------------------------------------//
 
@@ -452,7 +453,18 @@ function automatico(){
                         }
             }
 
-    });                   
+    });  
+	
+	
+	send_server("temp", "4");
+	send_server("temp", "2");
+	send_server("hstatus", "200");
+	send_server("hstay", "201");
+	send_server("htrigger", "202");
+	
+	//$('#ack').html("Temperatura: " + tempera );
+	
+		
 }
 
 function wait(ms){
@@ -519,6 +531,26 @@ function create_device_status_div(){
 //---------------------------------------------------------------//
 //Enviar los datos a pagina PHP que se lo envía al servidor.
 // DATA es la acción y DATA2 es la perisana que se debe controlar.
+function hShowTemp(data, place){
+	
+		if (place == "200"){ $('#bottom1').html("Estado: " + data);}
+		if (place == "201"){ $('#bottom2').html("Stay: " + data);}
+		if (place == "202"){ $('#bottom3').html("Trigger: " + data);}
+		
+		if (place == "4"){
+			data = data / 1024 * 330;
+			data = data -1;
+			$('#bottom4').html("Temperatura en el comedor: " + data.toFixed(1) );
+		}
+		
+		if(place == "2"){
+			data = data / 1024 * 330;
+			data = data -1;
+			$('#bottom5').html("Temperatura fuera es de:   " + data.toFixed(1) );
+			}
+			
+		
+}
 
 function send_server($data, $data2){
         
@@ -528,12 +560,18 @@ function send_server($data, $data2){
 	if (($valor1 != '') && ($valor2) )   {                                  //compruebo que mando acción y persiana para evitar problemas
            
 			$.post('php/global.php', {name:"t",data:$valor1,data2:$valor2}, function(data){ 	//Llamo a la funcion PHP pasando los valores por post
-														
-				if(data != 1){					//Color rojo en fallo de envio a DEV
+				
+				if (($valor1 == "temp" ) || ($valor1 == "hstatus") || ($valor1 == "hstay") || ($valor2 == "202")) {
+					hShowTemp(data, $valor2);
+					//alert(data);
+				}
+				
+				/*if(data != 1){					//Color rojo en fallo de envio a DEV
 
 					$('div#per'+$data2).css("background-color", "#E00");
-					$('#ack').html("Error sending to device: " + $data2); 
+					$('#ack').html("Error sending to device: " + $data2 + "valor retornado: " + data); 
 			      } else { $('#ack').html("Device: " + $data2 + " - Order: " + $valor1 + " - Answer: " + data );}
+				*/
 			
 		});
 	} else {

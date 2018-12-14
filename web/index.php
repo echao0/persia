@@ -202,7 +202,11 @@
 		</div>
 
 	<div id="bottom">  
-               <div id="ack"> </div>
+               <div id="bottom1"> </div>
+			   <div id="bottom2"> </div>
+			   <div id="bottom3"> </div>
+			   <div id="bottom4"> </div>
+			   <div id="bottom5"> </div>
           <!--  <a href="http://www.accuweather.com/en/es/barcelona/307297/weather-forecast/307297" class="aw-widget-legal">
             </a><div id="awcc1472638776505" class="aw-widget-current"  data-locationkey="307297" data-unit="c" data-language="es" data-useip="false" data-uid="awcc1472638776505"></div>
             <script type="text/javascript" src="http://oap.accuweather.com/launch.js"></script>

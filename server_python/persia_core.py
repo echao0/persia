@@ -238,11 +238,32 @@ class Heating():
         if python_args.verbose:
             print "El heating: " + self.name + " ha sido destruido"
 
+    def get_heatingOn(self):
+
+        if self.heatingOn == True:
+            return "1"
+        else:
+            return "0"
+
+    def get_stay(self):
+        if self.heatingStayTemp == True:
+            return "1"
+        else:
+            return "0"
+
+    def get_triggerTemp(self):
+        return round(self.heatingReachTemp, 1)
+
     def get_temp(self):
+        millivolts = {}
+        final_temp = ""
+        y = 0
+
         millivolts = (float(disp[self.tempDisp].comm("t")) / 1024.0) * 3300;
         celsius = millivolts / 10
         celsius = celsius
-        celsius = celsius - 2
+        celsius = celsius - 1
+
         return celsius
 
     def start(self):
@@ -257,6 +278,8 @@ class Heating():
         if python_args.verbose:
             print "Apagado de caldera recibido heating_off"
         self.heatingOn = False
+        self.heatingStayTemp = False
+        self.heatingReachTemp = 0
         disp[self.heatingDisp].comm("z")
 
     def raise_Temp(self, temp):
@@ -521,6 +544,21 @@ class ServerHandler(SocketServer.BaseRequestHandler):
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
                 devices_timers();
+
+            if datos[0] == "hstatus":
+                resp = heating.get_heatingOn()
+                self.jump = True
+                self.request.send(str(resp))
+
+            if datos[0] == "htrigger":
+                resp = heating.get_triggerTemp()
+                self.jump = True
+                self.request.send(str(resp))
+
+            if datos[0] == "hstay":
+                resp = heating.get_stay()
+                self.jump = True
+                self.request.send(str(resp))
 
             if datos[0] == "hRaise":
                 heating.raise_Temp(int(datos[1]))
