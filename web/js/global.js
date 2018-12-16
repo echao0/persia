@@ -540,13 +540,13 @@ function hShowTemp(data, place){
 		if (place == "4"){
 			data = data / 1024 * 330;
 			data = data -1;
-			$('#bottom4').html("Temperatura en el comedor: " + data.toFixed(1) );
+			$('#bottom4').html(data.toFixed(1) );
 		}
 		
 		if(place == "2"){
 			data = data / 1024 * 330;
 			data = data -1;
-			$('#bottom5').html("Temperatura fuera es de:   " + data.toFixed(1) );
+			$('#bottom5').html(data.toFixed(1) );
 			}
 			
 		

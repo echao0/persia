@@ -202,11 +202,15 @@
 		</div>
 
 	<div id="bottom">  
-               <div id="bottom1"> </div>
-			   <div id="bottom2"> </div>
-			   <div id="bottom3"> </div>
-			   <div id="bottom4"> </div>
-			   <div id="bottom5"> </div>
+               <div id="bottom_left" >
+				   <div id="bottom1" class="cale"> </div>
+				   <div id="bottom2" class="cale"> </div>
+				   <div id="bottom3" class="cale"> </div>
+			   </div>
+			   <div id="bottom_rigth" > 
+				   <div id="bottom4" class="cTemp"> </div>
+				   <div id="bottom5" class="cTemp"> </div>
+			   </div>
           <!--  <a href="http://www.accuweather.com/en/es/barcelona/307297/weather-forecast/307297" class="aw-widget-legal">
             </a><div id="awcc1472638776505" class="aw-widget-current"  data-locationkey="307297" data-unit="c" data-language="es" data-useip="false" data-uid="awcc1472638776505"></div>
             <script type="text/javascript" src="http://oap.accuweather.com/launch.js"></script>
