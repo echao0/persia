@@ -203,13 +203,27 @@
 
 	<div id="bottom">  
                <div id="bottom_left" >
-				   <div id="bottom1" class="cale"> </div>
-				   <div id="bottom2" class="cale"> </div>
-				   <div id="bottom3" class="cale"> </div>
+                    <div id="textBottom4"> Casa </div>
+                    <div id="bottom4" class="cTempL"> </div>
+
+                    <div id="textBottom5"> Exter.</div>
+                    <div id="bottom5" class="cTempL"> </div>				   
 			   </div>
+
+               <div id="bottom_center" >
+                    <div id="textBottom3"> </div>
+                    <div id="bottom3"> </div>
+                    <div id="bottom6" class="cTempC">+1</div>
+                    <div id="bottom1" class="cTempC"> </div>
+                    
+               </div>
+
 			   <div id="bottom_rigth" > 
-				   <div id="bottom4" class="cTemp"> </div>
-				   <div id="bottom5" class="cTemp"> </div>
+                    <div id="bottom2" class="rayse_stay" > </div>
+                    <div id="bottom7" class="cTempR">21</div>
+                    <div id="bottom8" class="cTempR">21.5</div>
+                    <div id="bottom9" class="cTempR">22</div>
+				   
 			   </div>
           <!--  <a href="http://www.accuweather.com/en/es/barcelona/307297/weather-forecast/307297" class="aw-widget-legal">
             </a><div id="awcc1472638776505" class="aw-widget-current"  data-locationkey="307297" data-unit="c" data-language="es" data-useip="false" data-uid="awcc1472638776505"></div>

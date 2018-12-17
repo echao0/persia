@@ -531,22 +531,23 @@ function create_device_status_div(){
 //---------------------------------------------------------------//
 //Enviar los datos a pagina PHP que se lo envía al servidor.
 // DATA es la acción y DATA2 es la perisana que se debe controlar.
-function hShowTemp(data, place){
+function hShowTemp(dato, place){
 	
-		if (place == "200"){ $('#bottom1').html("Estado: " + data);}
-		if (place == "201"){ $('#bottom2').html("Stay: " + data);}
-		if (place == "202"){ $('#bottom3').html("Trigger: " + data);}
-		
+		if (place == "200"){ $('#bottom1').html(dato);} // testigo de encendido de caldera
+		if (place == "202"){ $('#bottom3').html(dato);} // trigger de caldera
+		if (place == "201"){ $('#bottom2').html("rayse" + dato);}
+           
+
 		if (place == "4"){
-			data = data / 1024 * 330;
-			data = data -1;
-			$('#bottom4').html(data.toFixed(1) );
+			dato = dato / 1024 * 330;
+			dato = dato -1;
+			$('#bottom4').html(dato.toFixed(1) + "º");
 		}
 		
 		if(place == "2"){
-			data = data / 1024 * 330;
-			data = data -1;
-			$('#bottom5').html(data.toFixed(1) );
+			dato = dato / 1024 * 330;
+			dato = dato -1;
+			$('#bottom5').html(dato.toFixed(1) +"º" );
 			}
 			
 		
