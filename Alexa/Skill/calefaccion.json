@@ -1,0 +1,69 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "calefaccion",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "subir",
+                    "slots": [
+                        {
+                            "name": "grado",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "suba {grado} grado",
+                        "sube {grado} grado",
+                        "temperatura {grado}",
+                        "subir {grado}"
+                    ]
+                },
+                {
+                    "name": "stay",
+                    "slots": [
+                        {
+                            "name": "grado",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "que mantenga {grado} grados",
+                        "encienda a {grado} grados",
+                        "mantenga {grado} grados",
+                        "pon la cale a {grado} grados",
+                        "manten {grado} grados",
+                        "pon a {grado} grados",
+                        "enciende a {grado} grados"
+                    ]
+                },
+                {
+                    "name": "off",
+                    "slots": [],
+                    "samples": [
+                        "pare",
+                        "apage",
+                        "off",
+                        "apaga"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
+}

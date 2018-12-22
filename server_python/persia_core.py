@@ -85,7 +85,7 @@ class Timer():
 
     def __del__(self):
         if python_args.verbose:
-            print "El Temporizador: " + self.name + " a sido destruido"
+            print "El Temporizador: " + self.name + " ha sido destruido"
 
     def start_short(self):
 
@@ -196,15 +196,159 @@ def update():
     if python_args.verbose:
         print "Se han actualizado los valores de los dispositivos."
 
+class Heating():
+
+#Require class timer()
+
+    heatingReachTemp = 0    #Temperatura que debe de alcanzar antes de apagar
+    heatingActTemp = 0      #Temperatura interior actual
+    heatingStayTemp = False #Mantener encendido al alcanzar la temperatura
+    heatingOn = False       #Esta heating encendido o apagado?
+    heatingStatus = False  # Variable para saber estado del heating (trabajando o no)
+    hetingFullOff = False   #apagar el controlador manual?
+
+    name = False  # Nombre asignado al heating
+    heatingDisp = "5"  # Variable que indica que ip tiene el dispositivo a controlar salida
+    tempDisp = "4"    #Variable con la id del dispositivo que tiene el termometro
+
+    disp = False
+
+    global python_args
+
+    def set_heatingReachTemp(self, data):
+        self.heatingReachTemp = data
+
+    def heatingActTemp(self, data):
+        self.heatingActTemp = data
+
+    def heatingStayTemp(self, data):
+        self.heatingStayTemp = data
+
+    def heatingOn(self, data):
+        self.heatingOn = data
+
+    def hetingFullOff(self, data):
+        self.hetingFullOff = data
+
+    def __init__(empty):
+        if python_args.verbose:
+            print "Clase heating creada"
+
+    def __del__(self):
+        if python_args.verbose:
+            print "El heating: " + self.name + " ha sido destruido"
+
+    def get_heatingOn(self):
+
+        if self.heatingOn == True:
+            return "1"
+        else:
+            return "0"
+
+    def get_stay(self):
+        if self.heatingStayTemp == True:
+            return "1"
+        else:
+            return "0"
+
+    def get_triggerTemp(self):
+        return round(self.heatingReachTemp, 1)
+
+    def get_temp(self):
+        millivolts = {}
+        final_temp = ""
+        y = 0
+
+        millivolts = (float(disp[self.tempDisp].comm("t")) / 1024.0) * 3300;
+        celsius = millivolts / 10
+        celsius = celsius
+        celsius = celsius - 1
+
+        return celsius
+
+    def start(self):
+        self.heatingOn = True
+        self.heatingActTemp = self.get_temp() #Saber la temperatura actual.
+
+        if self.heatingActTemp < self.heatingReachTemp:
+            disp[self.heatingDisp].comm("s")        #Activo la output de encendido
+            self.heatingStatus = True
+
+    def heating_off(self,temp):
+        if python_args.verbose:
+            print "Apagado de caldera recibido heating_off"
+        self.heatingOn = False
+        self.heatingStayTemp = False
+        self.heatingReachTemp = 0
+        disp[self.heatingDisp].comm("z")
+
+    def raise_Temp(self, temp):
+        if python_args.verbose:
+            print "Alcanzar la temperatura encendido raise_Temp"
+        self.heatingActTemp = self.get_temp()
+        self.heatingReachTemp = self.heatingActTemp + temp - 0.1
+        self.heatingStayTemp = False
+        if python_args.verbose:
+            print "temperatura a alcanzar "
+            print self.heatingReachTemp
+        self.start()
+
+    def heating_stay(self, temp):
+        if python_args.verbose:
+            print "Mantener la temperatura encendido raise_Temp"
+        self.heatingReachTemp = temp
+        self.heatingStayTemp = True
+        self.start()
+
+    def heating_full_off(self, temp):
+        if python_args.verbose:
+            print "Apagado total (manual) recibido heating_full_off"
+        self.heatingReachTemp = -10
+        self.heatingOn = False
+        self.hetingFullOff = False
+        disp[self.heatingDisp].comm("b")
+
+    def heating_timer_control(self):
+        if python_args.verbose:
+            print "dentro de control de heating"
+        if self.heatingOn == True:
+            self.heatingActTemp = self.get_temp()  # Saber la temperatura actual.
+            if python_args.verbose:
+                print "La temperatura actual es: "
+                print self.heatingActTemp
+                print "La temperatura alcanza: "
+                print self.heatingReachTemp
+
+            if self.heatingActTemp >= self.heatingReachTemp:
+                if python_args.verbose:
+                    print "Se ha alcanzado la temperatura : "
+                    print self.heatingActTemp
+
+                disp[self.heatingDisp].comm("z")
+                self.heatingStatus = False
+
+                if not self.heatingStayTemp:
+                    self.heatingOn = False
+                    self.heatingReachTemp = 0.0
+
+            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.5 < self.heatingReachTemp:
+                disp[self.heatingDisp].comm("s")
+                self.heatingStatus = True
+
 class Device():
 
-    def __init__(self, name, ip, wtime, id, infi=False):
+    def __init__(self, name, ip, wtime, id, infi=False, heatingReachTemp=0, heatingActTemp=0, heatingStayTemp=False, heatingOn=False, hetingFullOff=False):
         self.name = name
         self.ip = ip
         self.wtime = wtime
         self.infi = infi  # never stop automatically
         self.id = id
         self.status = "offline"  # It's online or offline
+        self.heatingReachTemp = heatingReachTemp
+        self.heatingActTemp = heatingActTemp
+        self.heatingStayTemp = heatingStayTemp
+        self.heatingOn = heatingOn
+        self.hetingFullOff = hetingFullOff
 
         if python_args.verbose:
             print "id------------ : " + self.id
@@ -217,7 +361,7 @@ class Device():
 
     def __del__(self):
         if python_args.verbose:
-            print "El objeto: " + self.name + " a sido destruido"
+            print "El objeto: " + self.name + " ha sido destruido"
 
     def get_name(self):
         return self.name
@@ -252,7 +396,22 @@ class Device():
     def set_id(self, new_id):
         self.id = new_id
 
-        # ------Gemeral functions --------------------------------------
+    def set_heatingReachTemp(self, data):
+        self.heatingReachTemp = data
+
+    def heatingActTemp(self, data):
+        self.heatingActTemp = data
+
+    def heatingStayTemp(self, data):
+        self.heatingStayTemp = data
+
+    def heatingOn(self, data):
+        self.heatingOn = data
+
+    def hetingFullOff(self, data):
+        self.hetingFullOff = data
+
+# ------General functions --------------------------------------
 
     def comm(self, data):
 
@@ -269,7 +428,7 @@ class Device():
                 if not resp:
                     break
                 if python_args.verbose:
-                    print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+                        print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
                 break
             client.close()
             return resp
@@ -354,7 +513,7 @@ def devices_timers():
 
 class ServerHandler(SocketServer.BaseRequestHandler):
     def handle(self):
-
+        self.jump = False
         self.data = self.request.recv(1024).strip()
 
         if self.data == "beat":  # Control para no imprimir en pantalla latidos
@@ -364,8 +523,12 @@ class ServerHandler(SocketServer.BaseRequestHandler):
             datos = self.data.split(",")  # separo la cadena y formo una lista datos[1] = persiana datos[0] = accion
 
             if python_args.verbose:
-                print "Persiana: " + datos[1]
-                print "Accion: " + datos[0]
+                if float(datos[1]) != 200: #evito mostrar cuando se preguntan temperaturas
+                    if float(datos[1]) != 201:
+                        if float(datos[1]) != 202:
+                            if str(datos[0]) != "temp":
+                                    print "Persiana: " + datos[1]
+                                    print "Accion: " + datos[0]
 
             if datos[0] == "abajo":
                 resp = disp[str(datos[1])].comm("b")
@@ -381,19 +544,53 @@ class ServerHandler(SocketServer.BaseRequestHandler):
 
             if datos[0] == "temp":
                 resp = disp[str(datos[1])].comm("t")
+                self.jump = True
                 self.request.send(str(resp))
 
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
+                self.jump = True
                 devices_timers();
+
+            if datos[0] == "hstatus":
+                resp = heating.get_heatingOn()
+                self.jump = True
+                self.request.send(str(resp))
+
+            if datos[0] == "htrigger":
+                resp = heating.get_triggerTemp()
+                self.jump = True
+                self.request.send(str(resp))
+
+            if datos[0] == "hRaise":
+                heating.raise_Temp(int(datos[1]))
+                self.jump = True
+                self.request.send(str("1"))
+
+            if datos[0] == "hStay":
+                heating.heating_stay(float(datos[1]))
+                self.jump = True
+                self.request.send(str("1"))
+
+            if datos[0] == "hOff":
+                heating.heating_off(int(datos[1]))
+                self.jump = True
+                self.request.send(str("1"))
+
+            if datos[0] == "hFOff":
+                heating.heating_full_off(int(datos[1]))
+                self.jump = True
+                self.request.send(str("1"))
 
             if datos[0] == "server":
                 self.request.send(str("Apagando el servidor"))
                 os.system("ssh echao@192.168.3.151 'sudo shutdown now'")
+                self.jump = True
                 #mandatory to creater sudo su RSA-KEY and send it to server
 
-            if not disp[str(datos[1])].get_infi():          #If not a infinite device, start timer to automatically stop
-                timers[str(datos[1])].start()
+            if not self.jump:
+                if not disp[str(datos[1])].get_infi():          #If not a infinite device, start timer to automatically stop
+                    timers[str(datos[1])].start()
 
 class miserver():
     global server_on
@@ -561,6 +758,13 @@ def timer_auto_lanza(matriz):  # saber con la matriz de timer_auto() si es la ho
 
                 disp[str(matriz[i][0])].comm(str(matriz[i][8]))  # Send command to device
 
+def timer_heating():
+    print "dentro de timer heating"
+    heatingT = Timer()
+    heatingT.name = "latido"  # Timer for online pulse
+    heatingT.wtime = 10
+    heatingT.beat = True  # Activate infinite counter
+    heatingT.start()
 
 # ----------- Program Start ---------#
 # -----------------------------------#
@@ -601,6 +805,15 @@ timerAutomove.wtime = 60
 timerAutomove.beat = True  # Activate infinite counter
 timerAutomove.start()
 
+heatingT = Timer()
+heatingT.name = "heating"  # Timer for online pulse
+heatingT.wtime = 30
+heatingT.beat = True  # Activate infinite counter
+heatingT.start()
+
+heating = Heating()     #Creo el heating
+
+
 # ---------------------------------------------------------------------------------------
 
 try:
@@ -625,6 +838,11 @@ try:
                 print "----------------"
 
             timerLatido.set_trigger(False)
+
+        if heatingT.get_trigger() == True:
+            heating.heating_timer_control()
+            heatingT.set_trigger(False)
+
         time.sleep(sleep_time)
 
 except KeyboardInterrupt:
@@ -634,4 +852,5 @@ except KeyboardInterrupt:
     disp = ""
     timers = ""
     server_on = False
+    client_socket.close()
     os.system('sudo killall persia')

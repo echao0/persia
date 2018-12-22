@@ -2,6 +2,7 @@
 //---------------------------------------------------------------//
 
 var devices_numbers;
+var tempera;
 
 //---------------------------------------------------------------//
 
@@ -387,6 +388,36 @@ $('#boton_down').on('click' , function(){						//Hacer que el boton funcione par
         send_server(data,climb_select());               //Llamo a la funcion send_server y le paso el numero de persiana que quiero controlar
 })
 
+//---------------------------------------------------------------//
+//Acciones de botones de Heating
+
+$('#bottom1').on('click' , function(){                     //Boton de parada
+    
+    var data = "hOff";     
+    send_server(data,"5");              
+})
+$('#bottom7').on('click' , function(){                     //Boton de parada
+    
+    var data = "hStay";     
+    send_server(data,"21");              
+})
+$('#bottom8').on('click' , function(){                     //Boton de parada
+    
+    var data = "hStay";     
+    send_server(data,"21.5");              
+})
+$('#bottom9').on('click' , function(){                     //Boton de parada
+    
+    var data = "hStay";     
+    send_server(data,"22");              
+})
+$('#bottom6').on('click' , function(){                     //Boton de parada
+    
+    var data = "hRaise";     
+    send_server(data,"1");              
+})
+
+
 //-----------------------  Funciones -----------------------------//
 
 // Funcion para saber que persiana esta selecciona, 
@@ -452,7 +483,17 @@ function automatico(){
                         }
             }
 
-    });                   
+    });  
+	
+	if ($(bottom).is(":visible") == true){
+        	send_server("temp", "4");
+        	send_server("temp", "2");
+        	send_server("hstatus", 200);
+        	//send_server("hstay", 201);
+        	send_server("htrigger", 202);
+	}
+	
+		
 }
 
 function wait(ms){
@@ -519,6 +560,27 @@ function create_device_status_div(){
 //---------------------------------------------------------------//
 //Enviar los datos a pagina PHP que se lo envía al servidor.
 // DATA es la acción y DATA2 es la perisana que se debe controlar.
+function hShowTemp(dato, place){
+	
+		if (place == "200"){ $('#bottom1').html(dato);} // testigo de encendido de caldera
+		if (place == "202"){ $('#bottom3').html(dato);} // trigger de caldera
+		if (place == "201"){ $('#bottom2').html("rayse" + dato);}
+           
+
+		if (place == "4"){
+			dato = dato / 1024 * 330;
+			dato = dato -1;
+			$('#bottom4').html(dato.toFixed(1) + "º");
+		}
+		
+		if(place == "2"){
+			dato = dato / 1024 * 330;
+			dato = dato -1;
+			$('#bottom5').html(dato.toFixed(1) +"º" );
+			}
+			
+		
+}
 
 function send_server($data, $data2){
         
@@ -528,12 +590,18 @@ function send_server($data, $data2){
 	if (($valor1 != '') && ($valor2) )   {                                  //compruebo que mando acción y persiana para evitar problemas
            
 			$.post('php/global.php', {name:"t",data:$valor1,data2:$valor2}, function(data){ 	//Llamo a la funcion PHP pasando los valores por post
-														
-				if(data != 1){					//Color rojo en fallo de envio a DEV
+				
+				if (($valor1 == "temp" ) || ($valor1 == "hstatus") || ($valor1 == "hstay") || ($valor2 == "202")) {
+					hShowTemp(data, $valor2);
+					//alert(data);
+				}
+				
+				/*if(data != 1){					//Color rojo en fallo de envio a DEV
 
 					$('div#per'+$data2).css("background-color", "#E00");
-					$('#ack').html("Error sending to device: " + $data2); 
+					$('#ack').html("Error sending to device: " + $data2 + "valor retornado: " + data); 
 			      } else { $('#ack').html("Device: " + $data2 + " - Order: " + $valor1 + " - Answer: " + data );}
+				*/
 			
 		});
 	} else {
