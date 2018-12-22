@@ -225,7 +225,7 @@
                     <div id="bottom9" class="cTempR">22</div>
                     
                     <div id="bottom1" class="cTempC"> </div>
-                    <div id="bottom6" > Home +1</div>
+                    <div id="bottom6" > Casa +1º</div>
                     
 
                     

@@ -329,6 +329,7 @@ class Heating():
 
                 if not self.heatingStayTemp:
                     self.heatingOn = False
+                    self.heatingReachTemp = 0.0
 
             if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.5 < self.heatingReachTemp:
                 disp[self.heatingDisp].comm("s")
@@ -427,7 +428,7 @@ class Device():
                 if not resp:
                     break
                 if python_args.verbose:
-                    print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+                        print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
                 break
             client.close()
             return resp
@@ -522,8 +523,12 @@ class ServerHandler(SocketServer.BaseRequestHandler):
             datos = self.data.split(",")  # separo la cadena y formo una lista datos[1] = persiana datos[0] = accion
 
             if python_args.verbose:
-                print "Persiana: " + datos[1]
-                print "Accion: " + datos[0]
+                if float(datos[1]) != 200: #evito mostrar cuando se preguntan temperaturas
+                    if float(datos[1]) != 201:
+                        if float(datos[1]) != 202:
+                            if str(datos[0]) != "temp":
+                                    print "Persiana: " + datos[1]
+                                    print "Accion: " + datos[0]
 
             if datos[0] == "abajo":
                 resp = disp[str(datos[1])].comm("b")
@@ -539,10 +544,12 @@ class ServerHandler(SocketServer.BaseRequestHandler):
 
             if datos[0] == "temp":
                 resp = disp[str(datos[1])].comm("t")
+                self.jump = True
                 self.request.send(str(resp))
 
             if datos[0] == "update":
                 self.request.send(str("Actualizando"))
+                self.jump = True
                 devices_timers();
 
             if datos[0] == "hstatus":
@@ -555,18 +562,13 @@ class ServerHandler(SocketServer.BaseRequestHandler):
                 self.jump = True
                 self.request.send(str(resp))
 
-            if datos[0] == "hstay":
-                resp = heating.get_stay()
-                self.jump = True
-                self.request.send(str(resp))
-
             if datos[0] == "hRaise":
                 heating.raise_Temp(int(datos[1]))
                 self.jump = True
                 self.request.send(str("1"))
 
             if datos[0] == "hStay":
-                heating.heating_stay(int(datos[1]))
+                heating.heating_stay(float(datos[1]))
                 self.jump = True
                 self.request.send(str("1"))
 
@@ -583,6 +585,7 @@ class ServerHandler(SocketServer.BaseRequestHandler):
             if datos[0] == "server":
                 self.request.send(str("Apagando el servidor"))
                 os.system("ssh echao@192.168.3.151 'sudo shutdown now'")
+                self.jump = True
                 #mandatory to creater sudo su RSA-KEY and send it to server
 
             if not self.jump:
@@ -804,7 +807,7 @@ timerAutomove.start()
 
 heatingT = Timer()
 heatingT.name = "heating"  # Timer for online pulse
-heatingT.wtime = 10
+heatingT.wtime = 30
 heatingT.beat = True  # Activate infinite counter
 heatingT.start()
 
@@ -849,4 +852,5 @@ except KeyboardInterrupt:
     disp = ""
     timers = ""
     server_on = False
+    client_socket.close()
     os.system('sudo killall persia')

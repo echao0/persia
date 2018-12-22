@@ -388,6 +388,36 @@ $('#boton_down').on('click' , function(){						//Hacer que el boton funcione par
         send_server(data,climb_select());               //Llamo a la funcion send_server y le paso el numero de persiana que quiero controlar
 })
 
+//---------------------------------------------------------------//
+//Acciones de botones de Heating
+
+$('#bottom1').on('click' , function(){                     //Boton de parada
+    
+    var data = "hOff";     
+    send_server(data,"5");              
+})
+$('#bottom7').on('click' , function(){                     //Boton de parada
+    
+    var data = "hStay";     
+    send_server(data,"21");              
+})
+$('#bottom8').on('click' , function(){                     //Boton de parada
+    
+    var data = "hStay";     
+    send_server(data,"21.5");              
+})
+$('#bottom9').on('click' , function(){                     //Boton de parada
+    
+    var data = "hStay";     
+    send_server(data,"22");              
+})
+$('#bottom6').on('click' , function(){                     //Boton de parada
+    
+    var data = "hRaise";     
+    send_server(data,"1");              
+})
+
+
 //-----------------------  Funciones -----------------------------//
 
 // Funcion para saber que persiana esta selecciona, 
@@ -455,14 +485,13 @@ function automatico(){
 
     });  
 	
-	
-	send_server("temp", "4");
-	send_server("temp", "2");
-	send_server("hstatus", "200");
-	send_server("hstay", "201");
-	send_server("htrigger", "202");
-	
-	//$('#ack').html("Temperatura: " + tempera );
+	if ($(bottom).is(":visible") == true){
+        	send_server("temp", "4");
+        	send_server("temp", "2");
+        	send_server("hstatus", 200);
+        	//send_server("hstay", 201);
+        	send_server("htrigger", 202);
+	}
 	
 		
 }
