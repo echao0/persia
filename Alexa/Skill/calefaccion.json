@@ -43,6 +43,7 @@
                         }
                     ],
                     "samples": [
+                        "que mantenga {grado} grados",
                         "encienda a {grado} grados",
                         "mantenga {grado} grados",
                         "pon la cale a {grado} grados",

@@ -34,7 +34,7 @@ const handlers = {
         this.emit('echao');
     },
     'echao': function () {
-        this.response.speak("que pasa tio? ¿bienvenido a Calefaccion!");
+        this.response.speak("¡Bienvenido a Calefaccion!, puedes pedirme cosas como, Echo, dile a calefaccción que suba 1 grado. Echo, dile a calefacción que mantenga 22 grados. Echo, dile a calefacción que pare. ");
         this.emit(':responseReady');
     },
     'subir': function () {
@@ -79,7 +79,7 @@ const handlers = {
     },
     'off': function () {
         var numero = 15;
-           
+        
             var client = new net.Socket();
             client.connect(PORT, HOST, function() {
 	        client.write("hOff," + numero);
