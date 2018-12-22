@@ -211,18 +211,24 @@
 			   </div>
 
                <div id="bottom_center" >
-                    <div id="textBottom3"> </div>
+                    <!--<div id="textBottom3"> </div>-->
                     <div id="bottom3"> </div>
-                    <div id="bottom6" class="cTempC">+1</div>
-                    <div id="bottom1" class="cTempC"> </div>
+                    <div id="bottom2" class="rayse_stay" > </div>
+                    
+                    
                     
                </div>
 
 			   <div id="bottom_rigth" > 
-                    <div id="bottom2" class="rayse_stay" > </div>
                     <div id="bottom7" class="cTempR">21</div>
                     <div id="bottom8" class="cTempR">21.5</div>
                     <div id="bottom9" class="cTempR">22</div>
+                    
+                    <div id="bottom1" class="cTempC"> </div>
+                    <div id="bottom6" > Home +1</div>
+                    
+
+                    
 				   
 			   </div>
           <!--  <a href="http://www.accuweather.com/en/es/barcelona/307297/weather-forecast/307297" class="aw-widget-legal">
