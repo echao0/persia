@@ -65,6 +65,11 @@ class Table{
             $sql = "SELECT MAX(id) FROM `dispositivos` "; 
         }
 		
+        if ($type == 'hidden'){
+            //Creamos la consulta
+            $sql = "SELECT `id` FROM `dispositivos` WHERE `hidden` = 1";
+        }
+
         if ($type == 'status'){
         	//Creamos la consulta
         	$sql = "SELECT status FROM dispositivos WHERE id ='".$disp."'";
@@ -75,40 +80,39 @@ class Table{
         	$sql = "SELECT ".$field." FROM dispositivos WHERE id ='".$disp."'";
                 
         }
-                if ($type == 'update_ip'){
+        if ($type == 'update_ip'){
         	//Creamos la consulta
         	$sql = "UPDATE `dispositivos` SET `ip`='".$data."'WHERE `id` = '".$disp."'";
                 
         }
-                if ($type == 'update_move'){
+        if ($type == 'update_move'){
         	//Creamos la consulta
         	$sql = "UPDATE `dispositivos` SET `move`='".$data."'WHERE `id` = '".$disp."'";
                 
         }
-                if ($type == 'get_timer'){
+        if ($type == 'get_timer'){
                 $sql = "SELECT `hour`,`1`, `2`, `3`, `4`, `5`, `6`, `7`, `active`, `short` FROM `temporiza` WHERE `disp` = '".$disp."' and `type` = '".$data."' ";
                 
                 
         }
         
-                if ($type == 'get_timer_days'){
+        if ($type == 'get_timer_days'){
                 $sql = "SELECT ".$field." FROM `temporiza` WHERE `disp` = '".$disp."' and `type` = '".$data."' ";
                 
                 
         }
         
-                if ($type == 'update_timer_check'){
+        if ($type == 'update_timer_check'){
                  $sql = "UPDATE `temporiza` SET `active`='".$field."' , `hour` = '".$data."', `short` = '".$short."' WHERE `id` ='".$disp."'";
                  
         }
         
-                if ($type == 'update_timer_days'){
+        if ($type == 'update_timer_days'){
                  $sql = "UPDATE `temporiza` SET `".$disp."` = '".$field."' WHERE `temporiza`.`id` = '".$data."'";
                  
         }
         
         
-
         //obtenemos el array con toda la información
         return $this->getArraySQL($sql);
     }

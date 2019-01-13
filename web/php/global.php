@@ -22,31 +22,37 @@
 //data =
 //data2 =
 
+require 'conector.php';
+
 if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
 		if ( $_POST['name'] === "number" ) {
-			require 'conector.php';
 			$datos = new Table();
 			$estado = $datos->getAllInfo('number');
 			echo $estado [0]['MAX(id)'];
 		};
+
+		if ( $_POST['name'] === "hidden" ) {
+			$datos = new Table();
+			$estado = $datos->getAllInfo('hidden');
+			//echo $estado [0][$_POST['field']];
+            echo json_encode($estado);
+                       
+		};
 		
 		if ( $_POST['name'] === "s" ) {
-			require 'conector.php';
 			$datos = new Table();
 			$estado = $datos->getAllInfo('status', $_POST['disp']);
 			echo $estado [0]['status'];
 		};
 		
 		if ( $_POST['name'] === "c" ) {
-			require 'conector.php';
 			$datos = new Table();
 			$estado = $datos->getAllInfo('all_dis', $_POST['disp'],$_POST['field'] );
 			echo $estado [0][$_POST['field']];
                        
 		};
                 
-                if ( $_POST['name'] === "u_ip" ) {
-			require 'conector.php';
+        if ( $_POST['name'] === "u_ip" ) {
 			$datos = new Table();
                         
 			$estado = $datos->getAllInfo('update_ip', $_POST['disp'],$_POST['field'],$_POST['ip'] );
@@ -55,8 +61,7 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
                        
 		};
                 
-                if ( $_POST['name'] === "u_move" ) {
-			require 'conector.php';
+        if ( $_POST['name'] === "u_move" ) {
 			$datos = new Table();
                         
 			$estado = $datos->getAllInfo('update_move', $_POST['disp'],$_POST['field'],$_POST['time'] );
@@ -74,8 +79,7 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
 			send_server($_POST['data'],$_POST['data2'] );
 		}
                 
-                if ( $_POST['name'] === "pd" ) {
-			require 'conector.php';
+        if ( $_POST['name'] === "pd" ) {
 			$datos = new Table();
 			$estado = $datos->getAllInfo('get_timer', $_POST['disp'], $_POST['field'], $_POST['acc'] );
 			//echo $estado [0][$_POST['field']];
@@ -83,8 +87,7 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
                        
 		};
                 
-                if ( $_POST['name'] === "p" ) {
-			require 'conector.php';
+        if ( $_POST['name'] === "p" ) {
 			$datos = new Table();
 			$estado = $datos->getAllInfo('get_timer', $_POST['disp'], $_POST['field'], $_POST['acc'] );
 			//echo $estado [0][$_POST['field']];
@@ -92,16 +95,14 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
                        
 		};
                 
-                if ( $_POST['name'] === "t_checkb" ) {
-			require 'conector.php';
+        if ( $_POST['name'] === "t_checkb" ) {
 			$datos = new Table();
 			$estado = $datos->getAllInfo('update_timer_check', $_POST['disp'],$_POST['data'],$_POST['hour'],$_POST['short']);
                         echo $estado [0][$_POST['field']];
                        
 		};
                 
-                if ( $_POST['name'] === "t_days" ) {
-			require 'conector.php';
+        if ( $_POST['name'] === "t_days" ) {
 			$datos = new Table();
 			$estado = $datos->getAllInfo('update_timer_days', $_POST['disp'],$_POST['data'],$_POST['id']);
                         echo $estado [0][$_POST['field']];

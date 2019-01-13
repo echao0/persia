@@ -3,6 +3,7 @@
 
 var devices_numbers;
 var tempera;
+var hidden_devices = [];
 
 //---------------------------------------------------------------//
 
@@ -324,7 +325,7 @@ function get_days(i,z,t,data){
 }
 //Recuperar estado de los temporizadores
 
-    function get_tempo_(id){   
+function get_tempo_(id){   
     //Rescatar todos los valores de subida dispositivo 1.
    
     $.post('php/global.php', {name:"p" , disp:id , field:"hour", acc:"s"},function(data){
@@ -366,6 +367,8 @@ function get_days(i,z,t,data){
         $('#timepicker_b_3').val(data.substring(274, 279))            //Extraigo la hora y asigno a textbox
         })
     }
+
+
  
 //---------------------------------------------------------------//
 //Acciones de botones de control
@@ -510,9 +513,23 @@ function get_devices(){
 
 }
 
+function get_hidden(){ // get the id of hidden devices and return a json object
+	$.post('php/global.php', {name:"hidden"},function(data){
+		var obj = JSON.parse(data);
+
+		console.log("hidden id devices");
+
+		for (x = 0; x < Object.keys(obj).length; x++){
+			console.log(obj[x].id);
+			hidden_devices.push(obj[x].id);
+			}
+	})
+}
 
 function create_device_status_div(){
-		
+
+		get_hidden();
+
        
         $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
                 
@@ -690,6 +707,7 @@ function comprobarHora(fecha){
 }
 var d = new Date();
 comprobarHora(d);
+
 
 
 

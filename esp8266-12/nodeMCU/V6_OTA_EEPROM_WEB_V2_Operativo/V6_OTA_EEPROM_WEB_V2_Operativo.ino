@@ -29,6 +29,14 @@ int accion = 0;
   unsigned long currentMillis = 0;
 //----------------------------
 
+//-------------Smoothing-------
+const int numReadings = 10;
+int readings[numReadings];      // the readings from the analog input
+int readIndex = 0;              // the index of the current reading
+int total = 0;                  // the running total
+int average = 0;                // the average
+int tempOff = 0;
+//----------------------------
 
 void setup() {
 
@@ -39,6 +47,14 @@ delay(10);
 //strcat(wifi_password_private, "password");
 
 
+
+//-------------Smoothing-------
+
+for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+    readings[thisReading] = 0;
+  }
+//----------------------------
+  
 // ---- Leer los datos de configuracion desde EEPROM
 
 readEEPROM(0,32,wifi_ssid_private);
@@ -52,6 +68,7 @@ readEEPROM(96,16,egateway);
 ip.fromString(ipAddr);
 subnet.fromString(esubnet);
 gateway.fromString(egateway);
+
 
 //-------------------------------------------------------------
 
@@ -339,12 +356,31 @@ void loop() {
     }
 
    if (linea1 == "t" ) {
-        int analogValue = analogRead(tempPin);
-        //float millivolts = (analogValue/1024.0) * 3300; //3300 is the voltage provided by NodeMCU
-        //float celsius = millivolts/10;
+    tempOff =0;
+    
+    while (tempOff == 0){
+      total = total - readings[readIndex];
+      readings[readIndex] = analogRead(tempPin);
+      total = total + readings[readIndex];
+      readIndex = readIndex + 1;
+      
+       if (readIndex >= numReadings) {
+              readIndex = 0;
+              tempOff=1;
+          }
+    }
+    
+       /* int analogValue = analogRead(tempPin);
         Serial.print("Valor Leido=   ");
         Serial.println(analogValue);
         client.println(analogValue);
+        */
+        average = total / numReadings;
+        Serial.print("Valor Leido=   ");
+        Serial.println(average);
+        client.println(average);
+        
+        
     }
     
 
