@@ -220,9 +220,9 @@
                </div>
 
 			   <div id="bottom_rigth" > 
-                    <div id="bottom7" class="cTempR">20.5</div>
-                    <div id="bottom8" class="cTempR">21</div>
-                    <div id="bottom9" class="cTempR">21.5</div>
+                    <div id="bottom7" class="cTempR">20</div>
+                    <div id="bottom8" class="cTempR">20.5</div>
+                    <div id="bottom9" class="cTempR">21</div>
                     
                     <div id="bottom1" class="cTempC"> </div>
                     <div id="bottom6" > Casa +1º</div>
