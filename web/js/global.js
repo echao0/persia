@@ -399,17 +399,17 @@ $('#bottom1').on('click' , function(){                     //Boton de parada
 $('#bottom7').on('click' , function(){                     //Boton de parada
     
     var data = "hStay";     
-    send_server(data,"21");              
+    send_server(data,"20.5");              
 })
 $('#bottom8').on('click' , function(){                     //Boton de parada
     
     var data = "hStay";     
-    send_server(data,"21.5");              
+    send_server(data,"21");              
 })
 $('#bottom9').on('click' , function(){                     //Boton de parada
     
     var data = "hStay";     
-    send_server(data,"22");              
+    send_server(data,"21.5");              
 })
 $('#bottom6').on('click' , function(){                     //Boton de parada
     
