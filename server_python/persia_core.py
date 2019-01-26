@@ -273,6 +273,8 @@ class Heating():
         if self.heatingActTemp < self.heatingReachTemp:
             disp[self.heatingDisp].comm("s")        #Activo la output de encendido
             self.heatingStatus = True
+            sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '1');;"
+            result = db_conexion(sql)
 
     def heating_off(self,temp):
         if python_args.verbose:
@@ -281,6 +283,8 @@ class Heating():
         self.heatingStayTemp = False
         self.heatingReachTemp = 0
         disp[self.heatingDisp].comm("z")
+        sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) +"', '0');;"
+        result = db_conexion(sql)
 
     def raise_Temp(self, temp):
         if python_args.verbose:
@@ -326,6 +330,8 @@ class Heating():
 
                 disp[self.heatingDisp].comm("z")
                 self.heatingStatus = False
+                sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '0');;"
+                result = db_conexion(sql)
 
                 if not self.heatingStayTemp:
                     self.heatingOn = False
@@ -334,6 +340,8 @@ class Heating():
             if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.5 < self.heatingReachTemp:
                 disp[self.heatingDisp].comm("s")
                 self.heatingStatus = True
+                sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '1');;"
+                result = db_conexion(sql)
 
 class Device():
 

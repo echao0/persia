@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 08-12-2018 a las 12:12:50
+-- Tiempo de generación: 26-01-2019 a las 08:47:29
 -- Versión del servidor: 10.1.37-MariaDB-0+deb9u1
--- Versión de PHP: 7.0.30-0+deb9u1
+-- Versión de PHP: 7.0.33-0+deb9u1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -31,19 +31,34 @@ CREATE TABLE `dispositivos` (
   `ip` text NOT NULL,
   `status` text NOT NULL,
   `Time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `move` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `move` int(11) NOT NULL,
+  `hidden` int(11) NOT NULL DEFAULT '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `dispositivos`
 --
 
-INSERT INTO `dispositivos` (`id`, `ip`, `status`, `Time`, `move`) VALUES
-(0, '192.168.3.181', 'none', '2016-09-09 16:41:16', 0),
-(1, '192.168.3.171', 'ONLINE', '2018-12-08 11:03:54', 25),
-(2, '192.168.3.172', 'ONLINE', '2018-12-08 11:03:55', 25),
-(3, '192.168.3.173', 'ONLINE', '2018-12-08 11:03:55', 28),
-(4, '192.168.3.174', 'ONLINE', '2018-12-08 11:03:56', 0);
+INSERT INTO `dispositivos` (`id`, `ip`, `status`, `Time`, `move`, `hidden`) VALUES
+(0, '192.168.3.181', 'none', '2016-09-09 16:41:16', 0, 0),
+(1, '192.168.3.171', 'ONLINE', '2019-01-26 07:41:06', 25, 0),
+(2, '192.168.3.172', 'ONLINE', '2019-01-26 07:41:07', 25, 0),
+(3, '192.168.3.173', 'ONLINE', '2019-01-26 07:41:06', 28, 0),
+(4, '192.168.3.174', 'ONLINE', '2019-01-26 07:41:07', 0, 1),
+(5, '192.168.3.175', 'ONLINE', '2019-01-26 07:41:07', 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Heating`
+--
+
+CREATE TABLE `Heating` (
+  `hour` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `actual` float NOT NULL,
+  `goal` float NOT NULL,
+  `action` int(1) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -65,7 +80,7 @@ CREATE TABLE `temporiza` (
   `7` int(1) NOT NULL,
   `active` varchar(2) NOT NULL,
   `short` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `temporiza`
@@ -84,12 +99,12 @@ INSERT INTO `temporiza` (`id`, `disp`, `hour`, `type`, `1`, `2`, `3`, `4`, `5`, 
 (10, 2, '15:30', 'b', 1, 1, 1, 1, 1, 1, 1, '0', 0),
 (11, 2, '00:20', 'b', 1, 1, 1, 1, 0, 0, 1, '0', 0),
 (12, 2, '22:27', 'b', 0, 0, 0, 0, 0, 0, 0, '0', 0),
-(13, 3, '08:00', 's', 1, 1, 1, 1, 1, 0, 0, '1', 1),
+(13, 3, '08:00', 's', 1, 1, 1, 1, 1, 0, 0, '1', 0),
 (14, 3, '18:30', 's', 1, 1, 1, 1, 1, 0, 0, '0', 1),
-(15, 3, '08:05', 's', 1, 1, 1, 1, 1, 0, 0, '1', 0),
+(15, 3, '08:15', 's', 1, 1, 1, 1, 1, 0, 0, '1', 0),
 (16, 3, '15:31', 'b', 1, 1, 1, 1, 1, 1, 1, '0', 0),
-(17, 3, '00:11', 'b', 1, 1, 1, 1, 0, 0, 1, '1', 0),
-(18, 3, '00:12', 'b', 1, 1, 1, 1, 1, 1, 1, '1', 0);
+(17, 3, '23:30', 'b', 1, 1, 1, 1, 0, 0, 1, '1', 0),
+(18, 3, '00:12', 'b', 1, 1, 1, 1, 1, 1, 1, '0', 0);
 
 --
 -- Índices para tablas volcadas
