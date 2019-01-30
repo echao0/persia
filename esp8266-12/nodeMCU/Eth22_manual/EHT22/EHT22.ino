@@ -159,6 +159,7 @@ WiFi.config(local_IP, gateway, subnet);
 
   Serial.print("IP Configurada: ");
   Serial.println(WiFi.localIP()); //Obtenemos la IP
+   analogReference(INTERNAL);
 
 }
 
