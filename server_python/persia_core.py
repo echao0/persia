@@ -209,7 +209,7 @@ class Heating():
 
     name = False  # Nombre asignado al heating
     heatingDisp = "5"  # Variable que indica que ip tiene el dispositivo a controlar salida
-    tempDisp = "4"    #Variable con la id del dispositivo que tiene el termometro
+    tempDisp = "6"    #Variable con la id del dispositivo que tiene el termometro
 
     disp = False
 
@@ -255,6 +255,10 @@ class Heating():
         return round(self.heatingReachTemp, 1)
 
     def get_temp(self):
+        celsius = float(disp[self.tempDisp].comm("t"));
+        return celsius
+
+    def get_temp_backup(self):
         millivolts = {}
         final_temp = ""
         y = 0
@@ -313,31 +317,35 @@ class Heating():
         disp[self.heatingDisp].comm("b")
 
     def heating_timer_control(self):
+
         if python_args.verbose:
-            print "dentro de control de heating"
+            print "Inside heating control"
+
         if self.heatingOn == True:
             self.heatingActTemp = self.get_temp()  # Saber la temperatura actual.
             if python_args.verbose:
-                print "La temperatura actual es: "
+                print "Actual Temp: "
                 print self.heatingActTemp
-                print "La temperatura alcanza: "
+                print "Reach Temp: "
                 print self.heatingReachTemp
 
             if self.heatingActTemp >= self.heatingReachTemp:
                 if python_args.verbose:
-                    print "Se ha alcanzado la temperatura : "
+                    print "Temp is reached : "
                     print self.heatingActTemp
+
+                if self.heatingStatus == True:
+                    sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '0');;"
+                    result = db_conexion(sql)
 
                 disp[self.heatingDisp].comm("z")
                 self.heatingStatus = False
-                sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '0');;"
-                result = db_conexion(sql)
 
                 if not self.heatingStayTemp:
                     self.heatingOn = False
                     self.heatingReachTemp = 0.0
 
-            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.5 < self.heatingReachTemp:
+            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.3 < self.heatingReachTemp:
                 disp[self.heatingDisp].comm("s")
                 self.heatingStatus = True
                 sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '1');;"
@@ -421,23 +429,45 @@ class Device():
 
 # ------General functions --------------------------------------
 
-    def comm(self, data):
+    def comm_old(self, data):
 
         try:
+            print("conectando el dispositivo: " + self.ip)
             working = True
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
             client.settimeout(15);
             client.connect((self.ip, 5000));
             time.sleep(0.11);
+            ip, port = client.getsockname()
+
+            #if self.ip == "192.168.3.181":
+            #    data += "\r\n"
+            print("enviando el paquete")
             client.send(data);
 
+            #time.sleep(0.5);
+
+            resp = ""
+            print("Entrando en el bucle de respuesta: " + resp)
+
             while 1:
-                resp = client.recv(1024)
-                if not resp:
-                    break
-                if python_args.verbose:
+                resp += client.recv(1024)
+                resp = data.decode("utf-8")
+                print ("he recibido: " + resp)
+                print (ip)
+                print (self.ip)
+
+                if resp.find("\r\n") > 0:
+                    print("detectado el caracter especia")
+                    if python_args.verbose:
+                        try:
+                            data = data.replace("\n", "")  # remove newline character
+                            data = data.replace("\r", "")  # remove newline character
+                        except:
+                            pass
                         print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
-                break
+                    break
+
             client.close()
             return resp
 
@@ -455,6 +485,75 @@ class Device():
             #   print "error when communicating with " + disp
             client.close()
             client = None
+            return 0
+
+    def comm(self, data):
+
+        try:
+            working = True
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            client.settimeout(2);
+            client.connect((self.ip, 5000));
+            # time.sleep(0.11);
+            client.send(data);
+            time.sleep(0.23);
+            resp = ""
+
+            while 1:
+                resp += client.recv(1024)
+                #print("recibo: " + resp)
+
+                if not resp:
+                    print("sin respuesta")
+                    break
+
+                #print ("la busqueda retorna: ")
+                #print(resp)
+                #print (resp.find("\r\n"))
+
+                if python_args.verbose:
+                    print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+                break
+            #print("retorno el dato")
+            #client.close()
+            return resp
+
+        except socket.timeout:
+            # if python_args.verbose:
+            #  print "timed out when connecting to " + disp
+            client.close()
+            client = None
+            print "no ha sido posible madar el paquete."
+            return 0
+
+    def comm_backup(self, data):
+
+        try:
+            working = True
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+            client.settimeout(15);
+            client.connect((self.ip, 5000));
+            #time.sleep(0.11);
+            client.send(data);
+            time.sleep(0.24);
+            resp = ""
+
+            while 1:
+                resp += client.recv(1024)
+                if not resp:
+                    break
+                if python_args.verbose:
+                        print "Le envio: " + data + " a dispositivo " + self.ip + " y me ha devuelto: " + resp;
+                break
+            client.close()
+            return resp
+
+        except socket.timeout:
+            # if python_args.verbose:
+            #  print "timed out when connecting to " + disp
+            client.close()
+            client = None
+            print "no ha sido posible madar el paquete."
             return 0
 
     def latido(self):
@@ -524,6 +623,12 @@ class ServerHandler(SocketServer.BaseRequestHandler):
         self.jump = False
         self.data = self.request.recv(1024).strip()
 
+        try:
+            self.data = self.data.replace("\n", "")  # remove newline character
+            self.data = self.data.replace("\r", "")  # remove newline character
+        except:
+            pass
+
         if self.data == "beat":  # Control para no imprimir en pantalla latidos
             self.request.send(str("ack"))
 
@@ -565,6 +670,11 @@ class ServerHandler(SocketServer.BaseRequestHandler):
                 self.jump = True
                 self.request.send(str(resp))
 
+            if datos[0] == "hlocalTemp":
+                    resp = heating.get_temp()
+                    self.jump = True
+                    self.request.send(str(resp))
+
             if datos[0] == "htrigger":
                 resp = heating.get_triggerTemp()
                 self.jump = True
@@ -603,7 +713,6 @@ class ServerHandler(SocketServer.BaseRequestHandler):
 class miserver():
     global server_on
     global python_args
-    global python_args
 
     def __init__(empty):
         if python_args.verbose:
@@ -619,8 +728,7 @@ class miserver():
     def server_start(self):  # Funcion de inicio y control de puerto de escucha
         try:
             server = SocketServer.TCPServer((server_host, server_port), ServerHandler)  # Creo el objeto servidor
-            server.socket.settimeout(
-                3.0)  # Selecciono un timeout del servidor de 5 segundos (evito fallo de cierre de server)
+            server.socket.settimeout(5.0)  # Selecciono un timeout del servidor de 5 segundos (evito fallo de cierre de server)
 
             while server_on:  # Control de variable de cierre de hilo principal
                 server.handle_request()
@@ -628,11 +736,10 @@ class miserver():
                 server.socket.shutdown()
                 server.socket.close()
 
-
         except:
             # print "##### NO ES POSIBLE INICIAR EL SERVER #####"
             # print "      ##### Espero 30 segundos #####"
-            time.sleep(30)
+            time.sleep(10)
             self.server_start()
 
     def server_start2(self):
@@ -780,8 +887,8 @@ def timer_heating():
 # outfile.write('Fusce vitae leo purus, a tempor nisi.\n')
 # outfile.close()
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-client_socket.settimeout(1)                      # Only wait 1 second for a response
+#client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+#client_socket.settimeout(3)                      # Only wait 1 second for a response
 
 os.system('clear')
 if python_args.verbose:
@@ -840,7 +947,10 @@ try:
                 print "----------------"
 
             for key, value in disp.iteritems():
-                disp[str(key)].latido()
+                if key == 0:
+                    pass
+                else:
+                    disp[str(key)].latido()
 
             if python_args.verbose:
                 print "----------------"
@@ -860,5 +970,5 @@ except KeyboardInterrupt:
     disp = ""
     timers = ""
     server_on = False
-    client_socket.close()
+    #client_socket.close()
     os.system('sudo killall persia')

@@ -339,7 +339,7 @@ void loop() {
   if (client) //Si hay un cliente presente
   {
     Serial.print("Nuevo Paquete: ");
-    digitalWrite(2, LOW);
+    //digitalWrite(2, LOW); // Si se activa el encendemos el led cuando tengamos un paquete
     //esperamos hasta que hayan datos disponibles
     while (!client.available() && client.connected())
     {
@@ -393,8 +393,6 @@ void loop() {
         Serial.print("Valor Leido=   ");
         Serial.println(Temperature);
         client.println(Temperature);
-        
-        
     }
     
 

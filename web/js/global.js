@@ -486,7 +486,7 @@ function automatico(){
     });  
 	
 	if ($(bottom).is(":visible") == true){
-        	send_server("temp", "4");
+        	send_server("hlocalTemp", "4");
         	send_server("temp", "2");
         	send_server("hstatus", 200);
         	//send_server("hstay", 201);
@@ -511,6 +511,7 @@ function get_devices(){
 }
 
 
+
 function create_device_status_div(){
 		
        
@@ -518,6 +519,76 @@ function create_device_status_div(){
                 
                 for (var i = 1; i <= data; i++) {
                     var o = i+1;
+
+        
+                                    //-------------------------------------------------------Devices status
+                                        $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Device " +  i + ":",}).appendTo('#disp_status');
+                                        $('<div/>', {id: 'name-data' + o,class: 'name-data',title: '',text: "Cargando",}).appendTo('#disp_status');
+
+                                    //-------------------------------------------------------Devices IP
+
+                                        $('<div/>', {id: 'conf-disp',class: 'conf-name',title: '',text: "Device " +  i + ":", }).appendTo('#config');
+                                        $('<div/>', {id: 'conf-ip'+i,class: 'conf-ip',title: '',}).appendTo('#config');
+                                        $('<input>', {type: 'text',id: 'conf-input'+i,class: 'conf-input',disabled: ""}).appendTo('#conf-ip'+i);
+                           
+
+
+            }
+
+                for (var i = 1; i <= data; i++) {
+
+                    //-------------------------------------------------------Devices Move Time
+                          
+                    $('<div/>', {id: 'sdiv-conf-time'+i,class: 'conf-ip',title: '',}).appendTo('#config');
+                    $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-time',disabled: ""}).appendTo('#conf-ip'+i);
+
+
+
+                    $.post('php/global.php', {name:"Dhidden" , disp:i},function(data){ //saber si hay que crear el elemento en web
+
+                                        var fields = data.split(",");
+                                        var hidden = fields[0];
+                                        var i = fields[1];
+                                        
+
+                                if (hidden == 0){   //Only create a div if hidden ins't true
+
+                                         $('<div/>', {
+                                                id: 'per'+i,
+                                                class: 'per',click: function(){
+                                                                        
+                                                    $('div[id ^= per]').css("background-color", ""); 
+                                                   
+                                                    $(this).css("background-color", "#A6A6A6");
+                                                    
+                                                    //Añado todo lo que corresponde a timers
+                                                   var call_func = "get_tempo_";
+                                                   var currentId = $(this).attr('id');
+
+                                                   if  ($("#temporizador").css("display") == "block"){eval( call_func + '('+ currentId.substr(3)+')' );$("#save2").hide("slow"); }
+                                    }
+                                    
+                    }).appendTo('#persiana');
+                                        
+                                }
+
+                                })
+
+        
+                   
+				   
+            	}
+        })
+}  
+
+function create_device_status_div_backup(){
+        
+       
+        $.post('php/global.php', {name:"number"},function(data){        //extrac max id number from DB, know number of devices
+                
+                for (var i = 1; i <= data; i++) {
+                    var o = i+1;
+
         //-------------------------------------------------------Devices status
                     $('<div/>', {id: 'disp-num',class: 'dispositivo',title: '',text: "Device " +  i + ":",}).appendTo('#disp_status');
                     $('<div/>', {id: 'name-data' + o,class: 'name-data',title: '',text: "Cargando",}).appendTo('#disp_status');
@@ -536,24 +607,24 @@ function create_device_status_div(){
                     //$('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-time',disabled: ""}).appendTo('#sdiv-conf-time'+i);
                     $('<input>', {type: 'text',id: 'conf-time'+i,class: 'conf-time',disabled: ""}).appendTo('#conf-ip'+i);
                    
-				    $('<div/>', {
-								    id: 'per'+i,
-								    class: 'per',click: function(){
-								    						
-									    $('div[id ^= per]').css("background-color", ""); 
-									   
-									    $(this).css("background-color", "#A6A6A6");
-									    
-									    //Añado todo lo que corresponde a timers
-									   var call_func = "get_tempo_";
-									   var currentId = $(this).attr('id');
+                    $('<div/>', {
+                                    id: 'per'+i,
+                                    class: 'per',click: function(){
+                                                            
+                                        $('div[id ^= per]').css("background-color", ""); 
+                                       
+                                        $(this).css("background-color", "#A6A6A6");
+                                        
+                                        //Añado todo lo que corresponde a timers
+                                       var call_func = "get_tempo_";
+                                       var currentId = $(this).attr('id');
 
-									   if  ($("#temporizador").css("display") == "block"){eval( call_func + '('+ currentId.substr(3)+')' );$("#save2").hide("slow"); }
+                                       if  ($("#temporizador").css("display") == "block"){eval( call_func + '('+ currentId.substr(3)+')' );$("#save2").hide("slow"); }
 
-    								}
-								    
-					}).appendTo('#persiana');
-            	}
+                                    }
+                                    
+                    }).appendTo('#persiana');
+                }
         })
 }  
 	
@@ -567,11 +638,16 @@ function hShowTemp(dato, place){
 		if (place == "201"){ $('#bottom2').html("rayse" + dato);}
            
 
-		if (place == "4"){
+	/*	if (place == "4"){  //Este se usa para el dm35
 			dato = dato / 1024 * 330;
 			dato = dato -1;
 			$('#bottom4').html(dato.toFixed(1) + "º");
-		}
+		}*/
+
+        if (place == "4"){ //Este se usa para el eth22
+            $('#bottom4').html(dato + "º");
+        }
+
 		
 		if(place == "2"){
 			dato = dato / 1024 * 330;
@@ -591,7 +667,7 @@ function send_server($data, $data2){
            
 			$.post('php/global.php', {name:"t",data:$valor1,data2:$valor2}, function(data){ 	//Llamo a la funcion PHP pasando los valores por post
 				
-				if (($valor1 == "temp" ) || ($valor1 == "hstatus") || ($valor1 == "hstay") || ($valor2 == "202")) {
+				if (($valor1 == "temp" ) || ($valor1 == "hstatus") || ($valor1 == "hstay") || ($valor2 == "202") || ($valor1 == "hlocalTemp")) {
 					hShowTemp(data, $valor2);
 					//alert(data);
 				}

@@ -64,6 +64,13 @@ class Table{
             //Creamos la consulta
             $sql = "SELECT MAX(id) FROM `dispositivos` "; 
         }
+
+        if ($type == 'hidden'){
+            //Creamos la consulta
+            $sql = "SELECT `hidden` FROM `dispositivos` WHERE id ='".$disp."'"; 
+            //$sql = "SELECT `id` FROM `dispositivos` WHERE hidden ='1'";
+        }
+
 		
         if ($type == 'status'){
         	//Creamos la consulta

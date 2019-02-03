@@ -12,6 +12,7 @@
 //pd = Recuperar los dias que afectan a los contadores
 //t_checkb == actualizar el estado de los checkbox
 //t_days = Cambiar el estado de los dias activos !activos en la DB
+//hiden = Saber si se debe de crear boton en web
 
 //-----------------------POST-------------------------------------//
 //
@@ -23,11 +24,19 @@
 //data2 =
 
 if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
+
 		if ( $_POST['name'] === "number" ) {
 			require 'conector.php';
 			$datos = new Table();
 			$estado = $datos->getAllInfo('number');
 			echo $estado [0]['MAX(id)'];
+		};
+
+		if ( $_POST['name'] === "Dhidden" ) {
+			require 'conector.php';
+			$datos = new Table();
+			$estado = $datos->getAllInfo('hidden', $_POST['disp']);
+			echo $estado[0]['hidden'].",".$_POST['disp'];
 		};
 		
 		if ( $_POST['name'] === "s" ) {
