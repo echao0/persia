@@ -13,7 +13,7 @@ python_args = parser.parse_args()
 
 if python_args.prefabrica == "dht22":
 	python_args.ip = "192.168.3.180"
-	python_args.command ="t"
+	python_args.command = "t"
 
 if not python_args.ip:
     print "Modo de uso:"
@@ -38,20 +38,28 @@ if not python_args.command:
 
 try:
     client=socket.socket(socket.AF_INET,socket.SOCK_STREAM);
-    client.settimeout(1);
+    client.settimeout(5);
     client.connect((python_args.ip,5000));
 
     time.sleep(0.11);
     
     client.send(python_args.command);
-    time.sleep(0.5)
-    while 1:
-        data = client.recv(1024)
-        data = data.decode("utf-8")
-	if not data: break
-        print "Esto me ha devuelto: " + data;
-        break
+    #time.sleep(0.5);
 
+
+    data = ""
+
+    while 1:
+        data += client.recv(1024)
+        data = data.decode("utf-8")
+
+        if data.find("\r\n") > 0:
+            break
+
+	#if not data: break
+     #   print "Esto me ha devuelto: " + data;
+     #   break
+    print "Esto me ha devuelto: " + data;
     client.close()
 
 except socket.timeout:
