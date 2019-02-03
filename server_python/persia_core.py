@@ -255,12 +255,7 @@ class Heating():
         return round(self.heatingReachTemp, 1)
 
     def get_temp(self):
-        millivolts = {}
-        final_temp = ""
-        y = 0
-
         celsius = float(disp[self.tempDisp].comm("t"));
-
         return celsius
 
     def get_temp_backup(self):
@@ -350,7 +345,7 @@ class Heating():
                     self.heatingOn = False
                     self.heatingReachTemp = 0.0
 
-            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.5 < self.heatingReachTemp:
+            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.3 < self.heatingReachTemp:
                 disp[self.heatingDisp].comm("s")
                 self.heatingStatus = True
                 sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '1');;"

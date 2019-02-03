@@ -486,7 +486,7 @@ function automatico(){
     });  
 	
 	if ($(bottom).is(":visible") == true){
-        	send_server("temp", "4");
+        	send_server("hlocalTemp", "4");
         	send_server("temp", "2");
         	send_server("hstatus", 200);
         	//send_server("hstay", 201);
@@ -567,11 +567,16 @@ function hShowTemp(dato, place){
 		if (place == "201"){ $('#bottom2').html("rayse" + dato);}
            
 
-		if (place == "4"){
+	/*	if (place == "4"){  //Este se usa para el dm35
 			dato = dato / 1024 * 330;
 			dato = dato -1;
 			$('#bottom4').html(dato.toFixed(1) + "º");
-		}
+		}*/
+
+        if (place == "4"){ //Este se usa para el eth22
+            $('#bottom4').html(dato + "º");
+        }
+
 		
 		if(place == "2"){
 			dato = dato / 1024 * 330;
@@ -591,7 +596,7 @@ function send_server($data, $data2){
            
 			$.post('php/global.php', {name:"t",data:$valor1,data2:$valor2}, function(data){ 	//Llamo a la funcion PHP pasando los valores por post
 				
-				if (($valor1 == "temp" ) || ($valor1 == "hstatus") || ($valor1 == "hstay") || ($valor2 == "202")) {
+				if (($valor1 == "temp" ) || ($valor1 == "hstatus") || ($valor1 == "hstay") || ($valor2 == "202") || ($valor1 == "hlocalTemp")) {
 					hShowTemp(data, $valor2);
 					//alert(data);
 				}
