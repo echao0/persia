@@ -24,6 +24,7 @@
 //data2 =
 
 if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
+
 		if ( $_POST['name'] === "number" ) {
 			require 'conector.php';
 			$datos = new Table();
@@ -31,11 +32,11 @@ if (isset($_POST['name']) === true && empty($_POST['name']) === false ) {
 			echo $estado [0]['MAX(id)'];
 		};
 
-		if ( $_POST['name'] === "hiden" ) {
+		if ( $_POST['name'] === "Dhidden" ) {
 			require 'conector.php';
 			$datos = new Table();
-			$estado = $datos->getAllInfo('hiden', $_POST['disp']);
-			echo $estado [0]['status'];
+			$estado = $datos->getAllInfo('hidden', $_POST['disp']);
+			echo $estado[0]['hidden'].",".$_POST['disp'];
 		};
 		
 		if ( $_POST['name'] === "s" ) {
