@@ -155,7 +155,7 @@ class Timer():
 
         self.wtime = self.wtime - 1  # Resto 1 para compensar bug de 1 segundo mas.
 
-        while (self.i <= self.wtime):  # No multiplico por 4, por lo que tengo 1/4 del tiempo programado.
+        while (self.i <= self.wtime * 2):  # Multiplico * 2, por lo que tengo 1/2 del tiempo programado.
             time.sleep(self.step)
             self.i = self.i + 1
 
