@@ -15,6 +15,6 @@ case $result in
 		*)
 			
 			echo “Se ha iniciado el progrograma Persia”
-			python /home/pi/Desktop/repositorios/persia/server_python/persia_core.py &
+			python /opt/persia/persia_core.py &
 			;;
 	esac

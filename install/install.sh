@@ -124,3 +124,30 @@ else
 
 	fi
 fi
+
+        echo ""
+        echo ""
+        read -p "Do you want to install the server? " -n 1 -r
+
+        echo    # (optional) move to a new line
+
+        if [[ $REPLY =~ ^[Yy]$ ]]
+        then
+		cp -r ../server_python /opt
+		mv /opt/server_python/ /opt/persia
+	fi
+
+        echo ""
+        echo ""
+        read -p "Do you want to cron job to server? " -n 1 -r
+
+        echo    # (optional) move to a new line
+
+        if [[ $REPLY =~ ^[Yy]$ ]]
+        then
+             crontab -l | { cat; echo "0 0 0 0 0 some entry"; } | crontab -
+
+        fi
+
+
+
