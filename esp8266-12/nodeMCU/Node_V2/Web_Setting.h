@@ -1,4 +1,11 @@
 
+Serial.println("");
+Serial.println("---------------------------------------------------------");
+Serial.println("Entrando en modo de configuracion");
+Serial.println("---------------------------------------------------------");
+Serial.println("");
+entry = 1;
+
 ESP.eraseConfig(); //Borramos toda la configuracion actual
              
              IPAddress local_IP(192,168,4,1);

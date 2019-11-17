@@ -1,9 +1,15 @@
 #include <ESP8266WiFi.h>
 #include "DHT.h"
 
-String ver = "2.0";
+String ver = "2.6";
 
 /*
+ * Version 2.6:
+ *     Error -> Corrección de Excepcion:3 al iniciar WIFI
+ *     
+ * Version 2.5:
+ *     m -> Retorna mac + tipo de sensor
+ *     
  * Version 2.0:
  *    var Temp_type -> DHT or LM3 -> Definir el tipo de sensor por web
  *    Reinicio automatico tras no conexión con wifi
@@ -72,22 +78,27 @@ int average = 0;                // the average
 int tempOff = 0;
 //----------------------------
 
-
-
 void setup() {
+
+//---------- Solve Excepcion 3 when connect to wifi
+WiFi.persistent(false);
+WiFi.disconnect(true);
+//----------------------
 
 Serial.begin(9600);
 delay(10);
 
-strcat(wifi_ssid_private, "Me-House");
-strcat(wifi_password_private, "Et-micasa");
+//strcat(wifi_ssid_private, "");
+//strcat(wifi_password_private, "");
 
 
 //-------------Smoothing-------
 
-for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+/*for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     readings[thisReading] = 0;
-  }
+    Serial.print("dentro de reading");
+  }*/
+  
 //----------------------------
   
 // ---- Leer los datos de configuracion desde EEPROM
@@ -208,9 +219,11 @@ Serial.println("");
                       Serial.print(".");
                       pass++;
                       
+                      if (digitalRead(0) == 0){
+                              #include "Web_Setting.h"
+                              }
                     }
           ESP.reset();
-  
     }
 
 
@@ -226,15 +239,8 @@ void loop() {
   // Activo la pag de configuración cuando el botón = (Flash) es pulsado durante Variable "interval"
   //----------------------------------------------------------------------------------
   if (configure == 1) {
-            Serial.println("");
-            Serial.println("---------------------------------------------------------");
-            Serial.println("Entrando en modo de configuracion");
-            Serial.println("---------------------------------------------------------");
-            Serial.println("");
-            entry = 1;
             #include "Web_Setting.h"
-    
-  }
+            }
   
   configure = 0;
   
@@ -243,15 +249,8 @@ void loop() {
          if (entry == 0){currentMillis = millis(); entry = 1;}
         
           if ((millis() - currentMillis >= interval)) {
-            Serial.println("");
-            Serial.println("---------------------------------------------------------");
-            Serial.println("Entrando en modo de configuracion");
-            Serial.println("---------------------------------------------------------");
-            Serial.println("");
-
-            #include "Web_Setting.h"
-             
-            }
+                          #include "Web_Setting.h"
+                          }
             
             delay(10);
         }
@@ -268,13 +267,12 @@ void loop() {
             Serial.print("Nuevo Paquete: ");
             digitalWrite(2, LOW); // Si se activa el encendemos el led cuando tengamos un paquete
             
-            //esperamos hasta que hayan datos disponibles
+            //esperamos datos disponibles
             while (!client.available() && client.connected())
             {
               delay(1);
             }
         
-            // Leemos la primera el mensaje del servidor.
             String linea1 = client.readStringUntil('\r');
             Serial.println(linea1);
         
@@ -316,7 +314,6 @@ void loop() {
             }
         
            if (linea1 == "t" ) {
-            
                 #include "Temp_read.h"
             }
 
@@ -333,11 +330,18 @@ void loop() {
               client.println("config");
               configure = 1;
             }
+
+            if (linea1 == "m" ) {
+              
+              client.print(WiFi.macAddress());
+              client.print("&");
+              client.println(Temp_type);
+              
+              Serial.print("MAC: ");
+              Serial.println(WiFi.macAddress());
+            }
             
-            
-        
             client.flush();
-            // client.println("Connection: close");
             digitalWrite(2, HIGH);
 
   }
