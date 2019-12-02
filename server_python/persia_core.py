@@ -251,7 +251,7 @@ class Heating():
         else:
             return "0"
 
-    def get_working(self):       #Saber si la caldera está trabajando.
+    def get_working(self):       #Saber si la caldera esta trabajando.
         if self.heatingStatus == True:
             return "1"
         else:
