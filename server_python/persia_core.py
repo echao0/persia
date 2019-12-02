@@ -251,6 +251,12 @@ class Heating():
         else:
             return "0"
 
+    def get_working(self):       #Saber si la caldera está trabajando.
+        if self.heatingStatus == True:
+            return "1"
+        else:
+            return "0"
+
     def get_triggerTemp(self):
         return round(self.heatingReachTemp, 1)
 
@@ -667,6 +673,11 @@ class ServerHandler(SocketServer.BaseRequestHandler):
 
             if datos[0] == "hstatus":
                 resp = heating.get_heatingOn()
+                self.jump = True
+                self.request.send(str(resp))
+
+            if datos[0] == "hworking":
+                resp = heating.get_working()
                 self.jump = True
                 self.request.send(str(resp))
 
