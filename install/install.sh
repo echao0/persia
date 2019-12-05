@@ -104,7 +104,7 @@ else
         		echo "INSTALLING " $variable
 			echo "---------------------------------------"
 			echo ""
-			apt install $variable 
+			apt install $variable -y
 		done
 
 
