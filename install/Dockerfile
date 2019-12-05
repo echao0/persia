@@ -4,7 +4,15 @@ RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install nano -y
 
+RUN apt-get install git -y
+
+RUN /opt/persia/install/install.sh
+
+
+
 WORKDIR /opt
+
+RUN git clone https://github.com/echao0/persia.git
 
 RUN mkdir on
 
@@ -12,15 +20,12 @@ WORKDIR /opt/on
 
 COPY on.py /opt/on
 
-WORKDIR /opt
 
-RUN apt-get install git -y
 
-RUN git clone https://github.com/echao0/persia.git
 
 EXPOSE 8618
 
-RUN /opt/persia/install/install.sh
+
 
 RUN /etc/init.d/mysql stop
 
