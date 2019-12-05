@@ -1,6 +1,6 @@
 #!/bin/bash
 
-lista="apache2 php mariadb-server phpmyadmin python2.7 python-mysqldb"
+lista="apache2 php mariadb-server python2.7 python-mysqldb"
 
 clear
 
