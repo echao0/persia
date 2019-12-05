@@ -81,12 +81,12 @@ else
  
 	echo ""
 	echo ""
-	read -p "Do you want to install the missing packets? " -n 1 -r
+	#read -p "Do you want to install the missing packets? " -n 1 -r
 
 	echo    # (optional) move to a new line
 
-	if [[ $REPLY =~ ^[Yy]$ ]]
-	then
+	#if [[ $REPLY =~ ^[Yy]$ ]]
+	#then
 
 
 		echo ""
@@ -122,5 +122,5 @@ else
 		echo ""
 		echo "---------------------------------------"
 
-	fi
+	#fi
 fi
