@@ -1,0 +1,12 @@
+Built a container
+
+ docker build -t "echao_test:v8" .
+
+Run container
+$ docker run -d echao_test:v8
+
+
+acceder a shell 
+
+ docker  exec -it busy_borg /bin/sh
+
