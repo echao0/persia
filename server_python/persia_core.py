@@ -351,7 +351,7 @@ class Heating():
                     self.heatingOn = False
                     self.heatingReachTemp = 0.0
 
-            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.3 < self.heatingReachTemp:
+            if self.heatingStayTemp == True and not self.heatingStatus and self.heatingActTemp + 0.2 < self.heatingReachTemp:
                 disp[self.heatingDisp].comm("s")
                 self.heatingStatus = True
                 sql = "INSERT INTO `Heating` (`hour`, `actual`, `goal`, `action`) VALUES (CURRENT_TIMESTAMP, '" + str(self.heatingActTemp) + "', '" + str(self.heatingReachTemp) + "', '1');;"
