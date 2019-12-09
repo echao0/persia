@@ -27,14 +27,13 @@ def db_conexion(sql): # Funcion para insertar/ rescatar datos en SQL
 os.system('/etc/init.d/apache2 restart')
 os.system('/etc/init.d/mysql restart')
 
-#try:
-#  sql = "SELECT `disp` FROM `temporiza` WHERE `active` = '1'"
-#  result = db_conexion(sql)
+try:
+  sql = "SELECT `disp` FROM `temporiza` WHERE `active` = '1'"
+  result = db_conexion(sql)
 
-#except:
-#  os.system('/opt/persia/install/db.sh')
+except:
+  os.system('/opt/persia/install/db.sh')
 
 while True:
   time.sleep(blink_interval)
-
 

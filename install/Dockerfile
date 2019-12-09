@@ -30,7 +30,7 @@ EXPOSE 80
 RUN chmod +x /opt/persia/install/db.sh
 #RUN /opt/persia/install/db.sh
 
-CMD ["python", "/opt/on/on.py"]
+CMD ["python2.7", "/opt/on/on.py"]
 
 VOLUME ["/etc/mysql", "/var/lib/mysql"]
 
