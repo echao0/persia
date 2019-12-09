@@ -11,5 +11,7 @@ MAINDB=${persia}
     mysql -e "CREATE USER persia@localhost IDENTIFIED BY '/Persia/';"
     mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'persia'@'localhost';"
     mysql -e "FLUSH PRIVILEGES;"
-    mysql -e "persia < /opt/persia/DataBase/persia.sql"
+    mysql persia < /opt/persia/DataBase/persia.sql
+
+
 # If /root/.my.cnf doesn't exist then it'll ask for root password

@@ -1,5 +1,6 @@
 #import RPi.GPIO as GPIO
 import time
+import os
 
 # Configure the PIN # 8
 #GPIO.setmode(GPIO.BOARD)
@@ -8,6 +9,9 @@ import time
 
 # Blink Interval 
 blink_interval = .5 #Time interval in Seconds
+
+os.system('/etc/init.d/apache2 restartls')
+os.system('/etc/init.d/mysql restart')
 
 # Blinker Loop
 while True:

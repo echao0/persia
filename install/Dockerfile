@@ -1,8 +1,13 @@
 FROM arm32v7/python:buster
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install nano python2.7 mariadb-server python-mysqldb git apache2 php -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install nano python2.7 python-mysqldb git apache2 php php-mysql php-mbstring -y
 
+RUN \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server
+
+EXPOSE 3306
+ 
 WORKDIR /opt
 RUN git clone https://github.com/echao0/persia.git
 
@@ -22,13 +27,14 @@ RUN sed -i 's,/var/www/html,/var/www/html/web,' 000-default.conf
 RUN /etc/init.d/apache2 restart
 EXPOSE 80
 
-RUN service mysql restart
-RUN service apache2 restart
+#RUN service mysql restart
+#RUN service apache2 restart
 RUN chmod +x /opt/persia/install/db.sh
-RUN /opt/persia/install/db.sh
+#RUN /opt/persia/install/db.sh
 
 CMD ["python", "/opt/on/on.py"]
 
 VOLUME ["/etc/mysql", "/var/lib/mysql"]
 
+WORKDIR /opt/persia/
 RUN echo "DONE!"
