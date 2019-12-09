@@ -5,7 +5,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install nano python2.7 python-mysqldb
 
 RUN \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server
-
 EXPOSE 3306
  
 WORKDIR /opt
