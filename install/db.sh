@@ -13,5 +13,4 @@ MAINDB=${persia}
     mysql -e "FLUSH PRIVILEGES;"
     mysql persia < /opt/persia/DataBase/persia.sql
 
-
 # If /root/.my.cnf doesn't exist then it'll ask for root password
