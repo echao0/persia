@@ -12,6 +12,8 @@ blink_interval = .5 #Time interval in Seconds
 
 os.system('/etc/init.d/apache2 restartls')
 os.system('/etc/init.d/mysql restart')
+os.system(/opt/persia/install/db.sh)
+
 
 # Blinker Loop
 while True:
