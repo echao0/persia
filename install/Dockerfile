@@ -24,11 +24,9 @@ RUN ln -s /opt/persia/web/ web
 
 WORKDIR /etc/apache2/sites-enabled/
 RUN sed -i 's,/var/www/html,/var/www/html/web,' 000-default.conf
-RUN /etc/init.d/apache2 restart
 EXPOSE 80
 
-#RUN service mysql restart
-#RUN service apache2 restart
+
 RUN chmod +x /opt/persia/install/db.sh
 #RUN /opt/persia/install/db.sh
 
