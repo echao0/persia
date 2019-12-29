@@ -8,4 +8,4 @@ Ademas de la adaptación de ESP8266 como dispositivo reconocible por Alexa.
 Actualmente está completada la conversión de la calefacción para control por voz total y control de temperatura en el hogar, 
 también la automatización de persianas así como la actuación automática bajo programación.
 
-Actualmente esta abierto el proyecto para servidor MQTT
+Actualmente esta abierto el proyecto para servidor MQTT así como la creación de un contenedor en Docker para facilitar la instalación de todo lo necesario.
