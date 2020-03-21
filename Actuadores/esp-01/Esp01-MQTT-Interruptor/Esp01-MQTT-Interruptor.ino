@@ -18,7 +18,7 @@ const char* topicMode = "persia/pul3/mode";
 const char* topicOrders = "persia/pul3/order";
 
 
-const char* mqttServer = "echao.asuscomm.com";
+const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
 const char* mqttUser = "pul3";
 const char* mqttPassword = "hola";
@@ -47,6 +47,10 @@ const int ledPin = 13;       // the pin that the LED is attached to
 
 int buttonState = 0;         // current state of the button
 int lastButtonState = 2;     // previous state of the button
+
+const int timeReadStop = 250; // Time to doble change 3 state to stop
+long startTime = 0; // Variable to control millis to timeReadStop
+int jump = 0; //State 3 detected
 
 //-----------------Include Functions----------------------
 #include "OTA.h"
@@ -132,6 +136,7 @@ if (WiFi.status() == WL_CONNECTED){
       delay(2000);
     }
   }
+  
 }
 
 
@@ -156,19 +161,40 @@ void loop() {
   }
  
  if (buttonState != lastButtonState) {
-   
-    if (buttonState == HIGH) {
-      // if the current state is HIGH then the button went from off to on:
-      Serial.println("on");
-      sendFunction("Subir,3");
+         lastButtonState = buttonState;
+         startTime = millis();
 
-    } else {
-      // if the current state is LOW then the button went from on to off:
-      Serial.println("off");
-      sendFunction("abajo,3");
-    }
+         while (millis() < startTime + timeReadStop) {
+            
+            buttonState = digitalRead(buttonPin);
+            
+            //Serial.println("Dentro del bucle 3");
+            
+            if (buttonState != lastButtonState) {
+              Serial.println("Estado 3");
+              sendFunction("stop,3");
+              jump = 1;
+              break;
+            }
+          
+         }
+                   
+  if (jump == 0){        
+              if (buttonState == HIGH) {
+                // if the current state is HIGH then the button went from off to on:
+                Serial.println("on");
+                sendFunction("Subir,3");
+          
+              } else {
+                // if the current state is LOW then the button went from on to off:
+                Serial.println("off");
+                sendFunction("abajo,3");
+              }
+      }
     delay(50);
   }
   lastButtonState = buttonState;
+  jump = 0;
   delay(50);
+  
 }
