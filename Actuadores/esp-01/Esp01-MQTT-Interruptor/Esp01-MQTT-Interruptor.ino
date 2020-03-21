@@ -1,14 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
-#include "OTA.h"
 
 #ifndef STASSID
 #define STASSID "Me-House"
 #define STAPSK  "Et-micasa"
 #endif
 
-const char* ver = "ESP-MQTT-V1";
+//-----------NAME----------------------------
+const char* ver = "ESP-MQTT-V2";
 String espName = "pul3";
 
 //-----------MQTT----------------------------
@@ -16,6 +16,7 @@ const char* topicConnect = "persia/connect";
 const char* topicLog = "persia/log";
 const char* topicMode = "persia/pul3/mode";
 const char* topicOrders = "persia/pul3/order";
+
 
 const char* mqttServer = "echao.asuscomm.com";
 const int mqttPort = 1883;
@@ -30,7 +31,6 @@ unsigned long previousTime = 0;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-
 
 //-----------Network----------------------------
 const char* ssid     = STASSID;
@@ -47,6 +47,15 @@ const int ledPin = 13;       // the pin that the LED is attached to
 
 int buttonState = 0;         // current state of the button
 int lastButtonState = 2;     // previous state of the button
+
+//-----------------Include Functions----------------------
+#include "OTA.h"
+#include "toCharFunction.h"
+#include "sendFunction.h"
+#include "callback.h"
+#include "mqttReconnect.h"
+
+//-----------------Program----------------------
 
 void setup() {
   pinMode(buttonPin, INPUT);
@@ -112,107 +121,33 @@ if (WiFi.status() == WL_CONNECTED){
   while (!client.connected()) {
     Serial.println("Connecting to MQTT...");
 
-    if (client.connect("ESP8266Client", mqttUser, mqttPassword )) {
-
-      Serial.println("connected");
-      client.publish(topicLog, "Conectado!");
+    if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
+       Serial.println("connected");
+       client.publish(topicLog, toCharFunction(espName+"-Conectado!"));
+       client.subscribe(topicMode);
+       client.subscribe(topicOrders);
     } else {
-
       Serial.print("failed with state ");
       Serial.print(client.state());
       delay(2000);
-
     }
   }
- client.subscribe(topicMode);
- client.subscribe(topicOrders);
-  
-}
-
-
-void callback(char* topic, byte* payload, unsigned int length) {
-
-  DynamicJsonDocument doc(1024);
-  deserializeJson(doc, payload);
-  JsonObject obj = doc.as<JsonObject>();
-   
-  
-
-      Serial.println("-----------------------------------------");
-      Serial.print("topic: ");
-      Serial.println(topic);
-      
-          if (String(topic) == String(topicMode)){
-            
-              String Mode = obj[String("mode")];
-              String Time = obj[String("time")];
-              
-                   Serial.print("mode : ");
-                   Serial.println(Mode);
-        
-                   Serial.print("Time : ");
-                    Serial.println(Time);
-        
-                if (Mode == "auto") {
-                        WorkMode = "auto";
-                        waitTime = Time.toInt();
-                        //client.publish(topicLog, "Modo automatico");
-                      }
-                if (Mode == "OTA" ) {
-                        Serial.println("Modo OTA");
-                        client.publish(topicLog, "Modo OTA -> ACTIVADO");
-                        OTA();
-                    }
-          
-            }
-        
-          if (String(topic) == String(topicOrders)){
-        
-            
-              String order = obj[String("order")];
-            
-              Serial.print("Order : ");
-              Serial.println(order);
-            
-            
-              Serial.println("-----------------------------------------");
-              Serial.println("");
-        
-                if (order == "esp8266" ) {
-                      client.publish(topicLog, "Recibido ONLINE");
-                    }
-                    
-                if (order == "getInfo" ) {
-                      String  resp = "{\"disp\":\""+espName+"\",\"version\":"+String(ver)+"}";
-                      char CharResp [40];
-                      resp.toCharArray(CharResp, 40);
-                      client.publish(topicLog, CharResp);
-                    }
-        
-            
-          }
-        
-          /* Serial.print("Message:");
-            for (int i = 0; i < length; i++) {
-             Serial.print((char)payload[i]);
-            }*/
 }
 
 
 void loop() {
  
- client.loop();
- 
  if (!client.connected()) {   //if no connection to mqtt brocker
-  
   unsigned long currentTime = millis();
 
   if (currentTime - previousTime >= eventInterval) {
-     mqttConnect();
+     mqttReconnect();
      previousTime = currentTime;
   }
  
- } 
+ } else {
+    client.loop();
+  }
  
  buttonState = digitalRead(buttonPin);   // read the pushbutton input pin:
 
@@ -236,65 +171,4 @@ void loop() {
   }
   lastButtonState = buttonState;
   delay(50);
-}
-
-void mqttConnect(){
-  
-    client.setServer(mqttServer, mqttPort);
-    client.setCallback(callback);
-
-    Serial.println("Connecting to MQTT...");
-
-    if (client.connect("ESP8266Client", mqttUser, mqttPassword )) {
-
-      Serial.println("connected");
-      client.publish(topicLog, "Conectado!");
-      client.subscribe(topicMode);
-      client.subscribe(topicOrders);
-      
-    } 
-
-  
-  }
-
-void sendFunction(String packet){
-
-      Serial.print("connecting to ");
-      Serial.print(host);
-      Serial.print(':');
-      Serial.println(port);
-    
-      // Use WiFiClient class to create TCP connections
-      WiFiClient client;
-      if (!client.connect(host, port)) {
-        Serial.println("connection failed");
-        delay(5000);
-        return;
-      }
-    
-      // This will send a string to the server
-      Serial.println("sending data to server");
-      if (client.connected()) {
-        client.println(packet);
-      }
-    
-      // wait for data to be available
-      unsigned long timeout = millis();
-      while (client.available() == 0) {
-        if (millis() - timeout > 5000) {
-          Serial.println(">>> Client Timeout !");
-          client.stop();
-          delay(6000);
-          return;
-        }
-}
-
-  Serial.println("receiving from remote server");
-  while (client.available()) {
-    char ch = static_cast<char>(client.read());
-    Serial.print(ch);
-  }
-  Serial.println();
-  Serial.println("closing connection");
-  client.stop();
 }
