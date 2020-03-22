@@ -1,0 +1,16 @@
+V3:
+	Utilizo - Gpio3 RX pin
+		Se soluciona el problema de reinicio cuando Gpio2 esta activada
+		 pinMode(3, FUNCTION_3);
+		 Comentar todo lo relacionado con Serial.print();
+
+	Se activa internal PullUp Resistor
+		No es necesario soldar resistencia externa
+		 pinMode(buttonPin, INPUT_PULLUP);
+
+	NO FUNCIONA OTA EN ESP8266-01
+
+V2:
+	Utilizo - Gpio2
+	
+	NO FUNCIONA OTA EN ESP8266-01

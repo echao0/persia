@@ -8,7 +8,7 @@
 #endif
 
 //-----------NAME----------------------------
-const char* ver = "ESP-MQTT-V2";
+const char* ver = "ESP-MQTT-V3";
 String espName = "test";
 
 //-----------MQTT----------------------------
