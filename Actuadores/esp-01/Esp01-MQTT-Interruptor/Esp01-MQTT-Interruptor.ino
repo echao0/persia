@@ -9,19 +9,19 @@
 
 //-----------NAME----------------------------
 const char* ver = "ESP-MQTT-V2";
-String espName = "pul3";
+String espName = "test";
 
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
 const char* topicLog = "persia/log";
-const char* topicMode = "persia/pul3/mode";
-const char* topicOrders = "persia/pul3/order";
+const char* topicMode = "persia/test/mode";
+const char* topicOrders = "persia/test/order";
 
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "pul3";
-const char* mqttPassword = "hola";
+const char* mqttUser = "test"; //test:test ; pul3:hola
+const char* mqttPassword = "test";
 
 String WorkMode = "";
 int waitTime;
@@ -41,7 +41,7 @@ const uint16_t port = 2000;
 
 //-----------------Control----------------------
 
-const int  buttonPin = 2;    // the pin that the pushbutton is attached to
+const int  buttonPin = 3;    // 2 the pin that the pushbutton is attached to
 const int ledPin = 13;       // the pin that the LED is attached to
 // Variables will change:
 
@@ -62,15 +62,17 @@ int jump = 0; //State 3 detected
 //-----------------Program----------------------
 
 void setup() {
+  pinMode(3, FUNCTION_3); // Descomentar para extra GPIO 1 TX GPIO 3 RX
   pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);   //Configure interal pullup resistor
   pinMode(ledPin, OUTPUT);
     
-  Serial.begin(115200);
+  //Serial.begin(115200);
   
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  //Serial.println();
+  //Serial.println();
+  //Serial.print("Connecting to ");
+  //Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -79,35 +81,35 @@ void setup() {
   
   while ((WiFi.status() != WL_CONNECTED) and (pass != 15)) {
       delay(500);
-      Serial.print(".");
+      //Serial.print(".");
       pass++;
      }
      
 if (WiFi.status() == WL_CONNECTED){
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
-          Serial.println("WiFi conectado");
-          Serial.print("IP Configurada: ");
-          Serial.println(WiFi.localIP()); //Obtenemos la IP
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
+          //Serial.println("");
+          //Serial.println("---------------------------------------------------------");
+          //Serial.println("");
+          //Serial.println("WiFi conectado");
+          //Serial.print("IP Configurada: ");
+          //Serial.println(WiFi.localIP()); //Obtenemos la IP
+          //Serial.println("");
+          //Serial.println("---------------------------------------------------------");
+          //Serial.println("");
   } else {
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
-          Serial.println("WiFi NO conectado, revise la configuración");
-          Serial.println("Para configurar pulsar el botón de flash durante 4 sec");
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
-          Serial.println("Se reiniciará en 10 sec");
+          //Serial.println("");
+          //Serial.println("---------------------------------------------------------");
+          //Serial.println("");
+          //Serial.println("WiFi NO conectado, revise la configuración");
+          //Serial.println("Para configurar pulsar el botón de flash durante 4 sec");
+          //Serial.println("");
+          //Serial.println("---------------------------------------------------------");
+          //Serial.println("");
+          //Serial.println("Se reiniciará en 10 sec");
           pass = 0;
           while ((pass != 10))
                     {
                       delay(1000);
-                      Serial.print(".");
+                      //Serial.print(".");
                       pass++;
                       
                      // if (digitalRead(0) == 0){
@@ -123,16 +125,16 @@ if (WiFi.status() == WL_CONNECTED){
   client.setCallback(callback);
 
   while (!client.connected()) {
-    Serial.println("Connecting to MQTT...");
+    //Serial.println("Connecting to MQTT...");
 
     if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
-       Serial.println("connected");
+       //Serial.println("connected");
        client.publish(topicLog, toCharFunction(espName+"-Conectado!"));
        client.subscribe(topicMode);
        client.subscribe(topicOrders);
     } else {
-      Serial.print("failed with state ");
-      Serial.print(client.state());
+      //Serial.print("failed with state ");
+      //Serial.print(client.state());
       delay(2000);
     }
   }
@@ -171,8 +173,9 @@ void loop() {
             //Serial.println("Dentro del bucle 3");
             
             if (buttonState != lastButtonState) {
-              Serial.println("Estado 3");
-              sendFunction("stop,3");
+              //Serial.println("Estado 3");
+              client.publish(topicLog, toCharFunction(espName+"-Estado 3!"));
+              //sendFunction("stop,3");
               jump = 1;
               break;
             }
@@ -182,13 +185,15 @@ void loop() {
   if (jump == 0){        
               if (buttonState == HIGH) {
                 // if the current state is HIGH then the button went from off to on:
-                Serial.println("on");
-                sendFunction("Subir,3");
+                //Serial.println("on");
+                client.publish(topicLog, toCharFunction(espName+"-ON!"));
+                //sendFunction("Subir,3");
           
               } else {
                 // if the current state is LOW then the button went from on to off:
-                Serial.println("off");
-                sendFunction("abajo,3");
+                //Serial.println("off");
+                client.publish(topicLog, toCharFunction(espName+"-OFF!"));
+                //sendFunction("abajo,3");
               }
       }
     delay(50);
