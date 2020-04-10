@@ -11,7 +11,7 @@ void mqttReconnect(){
       client.publish(topicLog, toCharFunction(espName+"-Conectado!"));
       client.subscribe(toCharFunction(topicMode));
       client.subscribe(toCharFunction(topicOrders));
-      
+      client.subscribe(toCharFunction(topicGeneral));
     } 
 
   

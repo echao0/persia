@@ -1,3 +1,10 @@
+/*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+ * Version ESP-MQTT-V3:
+ *     Mqtt Topic: Anado topicGeneral = persia/general
+ *     Mqtt topics -> Nombre dinamico teniendo en cuenta el nombre de espName 
+ *    
+ */
+ 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
@@ -9,19 +16,20 @@
 
 //-----------NAME----------------------------
 const char* ver = "ESP-MQTT-V3";
-String espName = "test";
+String espName = "esp3";
 
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
 const char* topicLog = "persia/log";
-const char* topicMode = "persia/test/mode";
-const char* topicOrders = "persia/test/order";
+String topicMode = "persia/"+espName+"/mode";
+String topicOrders = "persia/"+espName+"/order";
+String topicGeneral = "persia/general";
 
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "test"; //test:test ; pul3:hola
-const char* mqttPassword = "test";
+const char* mqttUser = "esp3"; //test:test ; pul3:hola
+const char* mqttPassword = "esp3";
 
 String WorkMode = "";
 int waitTime;
@@ -129,9 +137,10 @@ if (WiFi.status() == WL_CONNECTED){
 
     if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
        //Serial.println("connected");
-       client.publish(topicLog, toCharFunction(espName+"-Conectado!"));
-       client.subscribe(topicMode);
-       client.subscribe(topicOrders);
+       client.publish(topicLog, toCharFunction(espName+" - Conectado!"));
+       client.subscribe(toCharFunction(topicMode));
+       client.subscribe(toCharFunction(topicOrders));
+       client.subscribe(toCharFunction(topicGeneral));
     } else {
       //Serial.print("failed with state ");
       //Serial.print(client.state());

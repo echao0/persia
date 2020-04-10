@@ -9,9 +9,9 @@ void mqttReconnect(){
 
       Serial.println("connected");
       client.publish(topicLog, toCharFunction(espName+"-Conectado!"));
-      client.subscribe(topicMode);
-      client.subscribe(topicOrders);
-      
+      client.subscribe(toCharFunction(topicMode));
+      client.subscribe(toCharFunction(topicOrders));
+      client.subscribe(toCharFunction(topicGeneral));
     } 
 
   

@@ -4,10 +4,16 @@
 #include <ArduinoJson.h>
 
 
-String ver = "3.0";
-String espName = "per1";
+String ver = "3.1";
+String espName = "termo";
 
 /*
+ * Version 3.1:
+ *      Mqtt GPIO Control -> Es posible gobernar GPIO con Mqtt (up,down,stop)
+ *      JSON: Espacios erroneos rectificados
+ *      Cambio de nombre libreria callback -> mqttCallback
+ *      Mqtt Topic: Anado topicGeneral = persia/general
+ *      
  * Version 3.0:
  *      Add Basic MQTT
  *      MODO auto -> Entrega por tiempo en millis la informacion de temperatura
@@ -42,12 +48,13 @@ const char* topicConnect = "persia/connect";
 const char* topicLog = "persia/log";
 String topicMode = "persia/"+espName+"/mode";
 String topicOrders = "persia/"+espName+"/order";
+String topicGeneral = "persia/general";
 
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "per1"; //test:test ; pul3:hola
-const char* mqttPassword = "per1";
+const char* mqttUser = "termo"; //test:test ; pul3:hola
+const char* mqttPassword = "termo";
 
 String WorkMode = "";
 int waitTime;
@@ -68,12 +75,22 @@ float Temperature;
 float Humidity;
 //--------------------------
 
+//-----------------Variables Generales----------------------
+
+int tempPin= A0;
+char outS = D1;
+char outB = D2;
+char alto = LOW;
+char bajo = HIGH;
+int configure = 0; //Variable para entrar en config remotamente
+
+int accion = 0;
 
 //-----------------Include Functions----------------------
 #include "OTA.h"
 #include "eeprom.h"
 #include "toCharFunction.h"
-#include "callback.h"
+#include "mqttCallback.h"
 #include "mqttReconnect.h"
 
 
@@ -86,14 +103,7 @@ IPAddress subnet(255,255,255,0); // set subnet mask to match your
 
 WiFiServer server(5000);
 
-int tempPin= A0;
-char outS = D1;
-char outB = D2;
-char alto = LOW;
-char bajo = HIGH;
-int configure = 0; //Variable para entrar en config remotamente
 
-int accion = 0;
 
 //-------------Web_Conf-------
   const long interval = 1000;
@@ -272,6 +282,7 @@ Serial.println("");
        client.publish(topicLog, toCharFunction(espName+" - Conectado!"));
        client.subscribe(toCharFunction(topicMode));
        client.subscribe(toCharFunction(topicOrders));
+       client.subscribe(toCharFunction(topicGeneral));
     } else {
       //Serial.print("failed with state ");
       //Serial.print(client.state());
@@ -308,8 +319,8 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
       //client.publish(topicLog, toCharFunction(espName+"-AUTOMATICO!"));
       Temperature = dht.readTemperature();
       Humidity = dht.readHumidity();
-      client.publish(topicLog, toCharFunction("{\"disp\":\""+espName+"\",\"Temperatura\":\""+String(Temperature)+"\"}"));
-      client.publish(topicLog, toCharFunction("{\"disp\":\""+espName+"\",\"Humedad\":\""+String(Humidity)+"\"}"));
+      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\"}"));
+      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
       initialWaitTime = millis();
   }
 
@@ -319,9 +330,6 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
 
 
   
-
-client(espClient).publish(topicLog, toCharFunction(espName+" - Conectado!"));
-
   //----------------------------------------------------------------------------------
   // Activo la pag de configuración cuando el botón = (Flash) es pulsado durante Variable "interval"
   //----------------------------------------------------------------------------------
