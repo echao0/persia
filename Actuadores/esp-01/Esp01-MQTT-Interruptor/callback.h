@@ -26,7 +26,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
                       }
                 if (Mode == "OTA" ) {
                         Serial.println("Modo OTA");
-                        client.publish(topicLog, toCharFunction(espName+"-OTA->ACTIVADO"));
+                        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"mode\": \"OTA->ON\"}"));
                         OTA();
                     }
             }
@@ -52,10 +52,23 @@ void callback(char* topic, byte* payload, unsigned int length) {
                     }
                     
                 if (order == "getInfo" ) {
-                      client.publish(topicLog, toCharFunction("{\"disp\":\""+espName+"\",\"version\":\""+String(ver)+"\"}"));
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\"}"));
                     }
           }
-        
+
+        if (String(topic) == String(topicGeneral)){
+          String order = obj[String("order")];
+            
+              Serial.print("Order : ");
+              Serial.println(order);
+              Serial.println("-----------------------------------------");
+              Serial.println("");
+
+              if (order == "getInfo" ) {
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\"}")); 
+                    }
+          
+        }
           /* Serial.print("Message:");
             for (int i = 0; i < length; i++) {
              Serial.print((char)payload[i]);

@@ -1,0 +1,37 @@
+Topics:
+
+persia/log
+persia/"+espName+"/mode
+persia/"+espName+"/order
+persia/general
+
+Puerto Mqtt:
+	1883
+
+Conexión y espera: (test/ todos los demas) 
+
+	set $(cat pass.txt) && mosquitto_sub -h 192.168.3.181 -t persia/# -u $1 -P $1
+	set $(cat pass.txt) && mosquitto_sub -h 127.0.0.1 -t persia/log -q 2 -u $1 -P $1
+
+Conexión y envío:
+
+	set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/1 -m ‘temp:23,5’ -u $1 -P $1
+
+Conexión y envío Json:
+
+	set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/pul3/order -m "{\"order\": \"getInfo\",\"value2\": 40}" -u $1 -P $1
+
+
+Actuadores:
+	Test:
+		set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/termo/order -m "{\"order\": \"test\",\"value2\": 40}" -u $1 -P $1
+		set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/termo/order -m "{\"order\": \"getInfo\",\"value2\": 40}" -u $1 -P $1
+
+	OTA:
+		set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/termo/mode -m "{\"mode\": \"OTA\",\"value2\": 40}" -u $1 -P $1	
+	
+	AUTO:
+		set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/termo/mode -m "{\"mode\": \"auto\",\"time\": 5000}" -u $1 -P $1
+		set $(cat pass.txt) && mosquitto_pub -h 192.168.3.181 -d -t persia/termo/mode -m "{\"mode\": \"standar\",\"time\": 5000}" -u $1 -P $1
+
+
