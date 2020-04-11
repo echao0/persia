@@ -662,7 +662,7 @@ class ServerHandler(SocketServer.BaseRequestHandler):
                 self.request.send(str(resp))
 
             if datos[0] == "temp":
-                resp = disp[str(datos[1])].comm("t")
+                resp = float(disp[str(datos[1])].comm("t"));
                 self.jump = True
                 self.request.send(str(resp))
 
