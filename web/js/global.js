@@ -648,12 +648,15 @@ function hShowTemp(dato, place){
             $('#bottom4').html(dato + "º");
         }
 
-		
-		if(place == "2"){
-			dato = dato / 1024 * 330;
-			dato = dato -1;
-			$('#bottom5').html(dato.toFixed(1) +"º" );
-			}
+		if (place == "2"){ //Este se usa para el eth22
+            $('#bottom5').html(dato + "º");
+        }
+
+		//if(place == "2"){
+		//	dato = dato / 1024 * 330;
+		//	dato = dato -1;
+		//	$('#bottom5').html(dato.toFixed(1) +"º" );
+		//	}
 			
 		
 }
