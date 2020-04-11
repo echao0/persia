@@ -32,7 +32,7 @@ void OTA(){
         Serial.println("Start updating " + type);
       });
       ArduinoOTA.onEnd([]() {
-        Serial.println("\nEnd");
+        //Serial.println("\nEnd");
         ESP.reset();
       });
       ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {

@@ -1,6 +1,7 @@
 
 
 String str(Temp_type);
+str= "dh"; //forzar siempre para DHT
 
 if((str == "DH") or (str == "dh")){
 

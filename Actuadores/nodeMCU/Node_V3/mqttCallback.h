@@ -26,7 +26,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
                         
                       }
                       
-                if (Mode == "standar") {
+                if (Mode == "standard") {
                         WorkMode = "standard";
                         waitTime = 0;
                         client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"mode\": \"Standard\"}"));
@@ -60,7 +60,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
                     }
                     
                 if (order == "getInfo" ) {
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\"}")); 
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}")); 
                     }
 
                 if (order == "help" ) {
@@ -70,8 +70,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
                 if (order == "getTemp" ) {
                       Temperature = dht.readTemperature();
                       Humidity = dht.readHumidity();
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\"}"));
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
                     }
                  if (order == "up" ) {
                       client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Subiendo\"}"));
@@ -117,7 +116,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
               Serial.println("");
 
               if (order == "getInfo" ) {
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\"}")); 
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}")); 
                     }
           
         }

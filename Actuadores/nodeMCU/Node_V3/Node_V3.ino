@@ -1,13 +1,17 @@
-#include <ESP8266WiFi.h>
-#include "DHT.h"
-#include <PubSubClient.h>
-#include <ArduinoJson.h>
-
-
-String ver = "3.1";
-String espName = "termo";
-
+String ver = "3.2";
 /*
+ * Version 3.2:
+ *      Elimino todas las conexiones serial
+ *            Es necesario para la union con el FW de pulsadores y el uso de GPIO 3 en ESP01
+ *      ADD Mensajes de getInfo: Alive . connecting . Reconecting
+ *      ADD archivo de configuracion:
+ *          espName
+ *          mqttUser
+ *          mqttPassword
+ *          etc
+ *      MOD mensajes de temperatura en JSON
+ *      DHT22 forzado en Temp_read.h
+ *            
  * Version 3.1:
  *      Mqtt GPIO Control -> Es posible gobernar GPIO con Mqtt (up,down,stop)
  *      JSON: Espacios erroneos rectificados
@@ -43,18 +47,19 @@ String espName = "termo";
  *    Botón Flash ->Web de configuración IP - RED
  *    
  */
+ 
+#include <ESP8266WiFi.h>
+#include "DHT.h"
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+#include "config.h"
+
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
 const char* topicLog = "persia/log";
 String topicMode = "persia/"+espName+"/mode";
 String topicOrders = "persia/"+espName+"/order";
 String topicGeneral = "persia/general";
-
-
-const char* mqttServer = "192.168.3.181";
-const int mqttPort = 1883;
-const char* mqttUser = "termo"; //test:test ; pul3:hola
-const char* mqttPassword = "termo";
 
 String WorkMode = "";
 int waitTime;
@@ -73,7 +78,6 @@ uint8_t DHTPin = D3;
 DHT dht(DHTPin, DHTTYPE);                
 float Temperature;
 float Humidity;
-//--------------------------
 
 //-----------------Variables Generales----------------------
 
@@ -93,24 +97,10 @@ int accion = 0;
 #include "mqttCallback.h"
 #include "mqttReconnect.h"
 
-
-//--------------------------
-
-IPAddress ip(192,168,3,171); // where xx is the desired IP Address
-IPAddress gateway(0,0,0,0); // set gateway to match your network
-IPAddress subnet(255,255,255,0); // set subnet mask to match your
-
-
-WiFiServer server(5000);
-
-
-
 //-------------Web_Conf-------
   const long interval = 1000;
   int entry = 0;
   unsigned long currentMillis = 0;
-  
-//----------------------------
 
 //-------------Smoothing-------
 const int numReadings = 10;
@@ -128,21 +118,11 @@ WiFi.persistent(false);
 WiFi.disconnect(true);
 //----------------------
 
-Serial.begin(115200);
 delay(10);
 
 //strcat(wifi_ssid_private, "");
 //strcat(wifi_password_private, "");
 
-
-//-------------Smoothing-------
-
-/*for (int thisReading = 0; thisReading < numReadings; thisReading++) {
-    readings[thisReading] = 0;
-    Serial.print("dentro de reading");
-  }*/
-  
-//----------------------------
   
 // ---- Leer los datos de configuracion desde EEPROM
 
@@ -153,47 +133,15 @@ readEEPROM(80,16,ipAddr);
 readEEPROM(96,16,egateway);
 readEEPROM(112,3,Temp_type);
 
+
+
 //---- Convertir los resultados de string a IPADDRES----------
 
 ip.fromString(ipAddr);
 subnet.fromString(esubnet);
 gateway.fromString(egateway);
 
-
-
-//-------------------------------------------------------------
-
 delay(500);
-
-Serial.println("");
-Serial.println("Temp_type");
-Serial.println("");
-Serial.println("---------------------------------------------------------");
-Serial.print("Versión de Software V");
-Serial.println(ver);
-Serial.println("---------------------------------------------------------");
-Serial.println("");
-
-Serial.println("");
-Serial.println("---------------------------------------------------------");
-Serial.println("");
-Serial.print("Nombre de la wifi: ");
-Serial.println(wifi_ssid_private);
-Serial.print("Password de la wifi: ");
-Serial.println(wifi_password_private);
-Serial.print("Ip del terminal: ");
-Serial.println(ip);
-Serial.print("mascara del terminal: ");
-Serial.println(subnet);
-Serial.print("Gateway del terminal: ");
-Serial.println(gateway);
-Serial.print("Tipo de sensor: ");
-Serial.println(Temp_type);
-Serial.println("");
-
-Serial.println("---------------------------------------------------------");
-Serial.println("");
-
 
  //-----------IN/OUT------------
   
@@ -210,13 +158,9 @@ Serial.println("");
   
   pinMode(DHTPin, INPUT); // Lectura Eth22
   dht.begin();
-  
-//-----------------------------
 
-  Serial.println();
-  Serial.println();
-  Serial.print("Conectandose a red : ");
-  Serial.println(wifi_ssid_private);
+  
+//--------------WIFI START---------------
 
   WiFi.mode(WIFI_STA); //especifico que no quiero crear wifi
 
@@ -228,38 +172,19 @@ Serial.println("");
   while ((WiFi.status() != WL_CONNECTED) and (pass != 15))
   {
     delay(500);
-    Serial.print(".");
     pass++;
     
   }
 
   if (WiFi.status() == WL_CONNECTED){
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
-          Serial.println("WiFi conectado");
+          
             server.begin(); //Iniciamos el servidor
-          Serial.println("Servidor Iniciado");
-          Serial.print("IP Configurada: ");
-          Serial.println(WiFi.localIP()); //Obtenemos la IP
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
+          
   } else {
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
-          Serial.println("WiFi NO conectado, revise la configuración");
-          Serial.println("Para configurar pulsar el botón de flash durante 4 sec");
-          Serial.println("");
-          Serial.println("---------------------------------------------------------");
-          Serial.println("");
-          Serial.println("Se reiniciará en 10 sec");
           pass = 0;
           while ((pass != 10))
                     {
                       delay(1000);
-                      Serial.print(".");
                       pass++;
                       
                       if (digitalRead(0) == 0){
@@ -269,23 +194,19 @@ Serial.println("");
           ESP.reset();
     }
 
-//-----------MQTT----------------------------
+//-----------MQTT START----------------------------
 
   client.setServer(mqttServer, mqttPort);
   client.setCallback(callback);
 
   while (!client.connected()) {
-    //Serial.println("Connecting to MQTT...");
 
     if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
-       //Serial.println("connected");
-       client.publish(topicLog, toCharFunction(espName+" - Conectado!"));
+       client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"connecting\"}"));
        client.subscribe(toCharFunction(topicMode));
        client.subscribe(toCharFunction(topicOrders));
        client.subscribe(toCharFunction(topicGeneral));
     } else {
-      //Serial.print("failed with state ");
-      //Serial.print(client.state());
       delay(2000);
     }
   }
@@ -319,8 +240,7 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
       //client.publish(topicLog, toCharFunction(espName+"-AUTOMATICO!"));
       Temperature = dht.readTemperature();
       Humidity = dht.readHumidity();
-      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\"}"));
-      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
+      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
       initialWaitTime = millis();
   }
 
@@ -359,7 +279,6 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
   
   if (client) //Si hay un cliente presente
   {
-            Serial.print("Nuevo Paquete: ");
             //digitalWrite(2, LOW); // Si se activa el encendemos el led cuando tengamos un paquete
             
             //esperamos datos disponibles
@@ -369,7 +288,6 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
             }
         
             String linea1 = client.readStringUntil('\r');
-            Serial.println(linea1);
         
             if (linea1 == "OTA" ) {
               client.println("OTA ONLINE");
@@ -431,9 +349,7 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
               client.print(WiFi.macAddress());
               client.print("&");
               client.println(Temp_type);
-              
-              Serial.print("MAC: ");
-              Serial.println(WiFi.macAddress());
+
             }
             
             client.flush();
