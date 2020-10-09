@@ -24,11 +24,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
                         waitTime = Time.toInt();
                         //client.publish(topicLog, "Modo automatico");
                       }
-                if (Mode == "OTA" ) {
-                        Serial.println("Modo OTA");
-                        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"mode\": \"OTA->ON\"}"));
-                        OTA();
-                    }
+//                if (Mode == "OTA" ) {
+//                        Serial.println("Modo OTA");
+//                        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"mode\": \"OTA->ON\"}"));
+//                        OTA();
+//                    }
             }
         
           if (String(topic) == String(topicOrders)){
@@ -69,8 +69,5 @@ void callback(char* topic, byte* payload, unsigned int length) {
                     }
           
         }
-          /* Serial.print("Message:");
-            for (int i = 0; i < length; i++) {
-             Serial.print((char)payload[i]);
-            }*/
+
 }

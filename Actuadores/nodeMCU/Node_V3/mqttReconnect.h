@@ -12,6 +12,7 @@ void mqttReconnect(){
       client.subscribe(toCharFunction(topicMode));
       client.subscribe(toCharFunction(topicOrders));
       client.subscribe(toCharFunction(topicGeneral));
+      client.subscribe(toCharFunction(topicTemp));
     } 
 
   

@@ -11,6 +11,7 @@ String ver = "3.2";
  *          etc
  *      MOD mensajes de temperatura en JSON
  *      DHT22 forzado en Temp_read.h
+ *      add topic -> persia/temp
  *            
  * Version 3.1:
  *      Mqtt GPIO Control -> Es posible gobernar GPIO con Mqtt (up,down,stop)
@@ -60,6 +61,7 @@ const char* topicLog = "persia/log";
 String topicMode = "persia/"+espName+"/mode";
 String topicOrders = "persia/"+espName+"/order";
 String topicGeneral = "persia/general";
+const char* topicTemp = "persia/temp";
 
 String WorkMode = "";
 int waitTime;
@@ -198,14 +200,16 @@ delay(500);
 
   client.setServer(mqttServer, mqttPort);
   client.setCallback(callback);
-
+  
   while (!client.connected()) {
 
     if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
+      
        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"connecting\"}"));
        client.subscribe(toCharFunction(topicMode));
        client.subscribe(toCharFunction(topicOrders));
        client.subscribe(toCharFunction(topicGeneral));
+       client.subscribe(toCharFunction(topicTemp));
     } else {
       delay(2000);
     }
@@ -236,11 +240,19 @@ void loop() {
 // Modo automativo
 
 if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
-  
+     
+      /*StaticJsonDocument<200> doc;
+      doc["sensor"] = "gps";
+      doc["time"] = 1351824120;
+      String myOutput; serializeJson(doc, myOutput);  
+      char myOutput_char[200];
+      myOutput.toCharArray(myOutput_char, 200);
+      client.publish(topicLog,myOutput_char);*/
+
       //client.publish(topicLog, toCharFunction(espName+"-AUTOMATICO!"));
       Temperature = dht.readTemperature();
       Humidity = dht.readHumidity();
-      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
+      client.publish(topicTemp, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
       initialWaitTime = millis();
   }
 

@@ -12,6 +12,7 @@ Conexión y espera: (test/ todos los demas)
 
 	set $(cat pass.txt) && mosquitto_sub -h 192.168.3.181 -t persia/# -u $1 -P $1
 	set $(cat pass.txt) && mosquitto_sub -h 127.0.0.1 -t persia/log -q 2 -u $1 -P $1
+	set $(cat pass.txt) && mosquitto_sub -h 127.0.0.1 -t persia/temp -q 2 -u $1 -P $1
 
 Conexión y envío:
 

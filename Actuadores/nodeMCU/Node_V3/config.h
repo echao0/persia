@@ -1,8 +1,8 @@
 
 //------------NODE-----------------------------
-
+String type = "relay"; // switch; relay
 String espName = "per2";
-const char* mqttUser = "per2"; //test:test ; pul3:hola
+const char* mqttUser = "per2";
 const char* mqttPassword = "per2";
 
 //------------IP/TCP-----------------------------
