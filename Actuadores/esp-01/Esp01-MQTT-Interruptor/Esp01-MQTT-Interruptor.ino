@@ -1,8 +1,13 @@
-/*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+  /*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+ * Verison  ESP01-V4
+ *  Version para los interruptores
+ *  Funciona el callback y se le pueden dar ordenes 
+ *  Funciona  OTA
+ * 
  * Version ESP-MQTT-V3:
  *     Mqtt Topic: Anado topicGeneral = persia/general
  *     Mqtt topics -> Nombre dinamico teniendo en cuenta el nombre de espName 
- *    
+ * 
  */
  
 #include <ESP8266WiFi.h>
@@ -15,8 +20,8 @@
 #endif
 
 //-----------NAME----------------------------
-const char* ver = "ESP-MQTT-V3";
-String espName = "pul1";
+const char* ver = "ESP01-V4";
+String espName = "test";
 
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
@@ -28,8 +33,8 @@ String topicGeneral = "persia/general";
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "pul1"; //test:test ; pul3:hola
-const char* mqttPassword = "hola";
+const char* mqttUser = "test"; //test:test ; pul3:hola
+const char* mqttPassword = "test";
 
 String WorkMode = "";
 int waitTime;
@@ -61,7 +66,7 @@ long startTime = 0; // Variable to control millis to timeReadStop
 int jump = 0; //State 3 detected
 
 //-----------------Include Functions----------------------
-//#include "OTA.h"
+#include "OTA.h"
 #include "toCharFunction.h"
 #include "sendFunction.h"
 #include "callback.h"
@@ -129,7 +134,8 @@ if (WiFi.status() == WL_CONNECTED){
 //-----------MQTT----------------------------
 
   client.setServer(mqttServer, mqttPort);
-  //client.setCallback(callback); //SI descomento me da un error de memoria
+  delay(3000);
+  client.setCallback(callback); //SI descomento me da un error de memoria
 
   while (!client.connected()) {
 //    Serial.println("Connecting to MQTT...");
