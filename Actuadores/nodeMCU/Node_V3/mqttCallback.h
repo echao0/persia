@@ -34,6 +34,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
                       
                 if (Mode == "OTA" ) {
                         Serial.println("Modo OTA");
+                        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}"));
                         client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"mode\": \"OTA->ON\"}"));
                         OTA();
                     }
@@ -70,7 +71,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
                 if (order == "getTemp" ) {
                       Temperature = dht.readTemperature();
                       Humidity = dht.readHumidity();
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
+                      client.publish(topicTemp, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
                     }
                  if (order == "up" ) {
                       client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Subiendo\"}"));

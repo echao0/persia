@@ -1,8 +1,13 @@
-/*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+  /*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+ * Verison  ESP01-V4
+ *  Version para los interruptores
+ *  Funciona el callback y se le pueden dar ordenes 
+ *  Funciona  OTA
+ * 
  * Version ESP-MQTT-V3:
  *     Mqtt Topic: Anado topicGeneral = persia/general
  *     Mqtt topics -> Nombre dinamico teniendo en cuenta el nombre de espName 
- *    
+ * 
  */
  
 #include <ESP8266WiFi.h>
@@ -15,8 +20,8 @@
 #endif
 
 //-----------NAME----------------------------
-const char* ver = "ESP-MQTT-V3";
-String espName = "esp3";
+const char* ver = "ESP01-V4";
+String espName = "test";
 
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
@@ -28,8 +33,8 @@ String topicGeneral = "persia/general";
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "esp3"; //test:test ; pul3:hola
-const char* mqttPassword = "esp3";
+const char* mqttUser = "test"; //test:test ; pul3:hola
+const char* mqttPassword = "test";
 
 String WorkMode = "";
 int waitTime;
@@ -49,7 +54,7 @@ const uint16_t port = 2000;
 
 //-----------------Control----------------------
 
-const int  buttonPin = 3;    // 2 the pin that the pushbutton is attached to
+const int  buttonPin = 3;    // / Descomentar para extra GPIO 1 TX GPIO 3 RX - GP2 no inicia ESP en pin alto.
 const int ledPin = 13;       // the pin that the LED is attached to
 // Variables will change:
 
@@ -70,17 +75,16 @@ int jump = 0; //State 3 detected
 //-----------------Program----------------------
 
 void setup() {
-  pinMode(3, FUNCTION_3); // Descomentar para extra GPIO 1 TX GPIO 3 RX
-  pinMode(buttonPin, INPUT);
-  pinMode(buttonPin, INPUT_PULLUP);   //Configure interal pullup resistor
+  //pinMode(buttonPin, FUNCTION_3); // GPIO 1 TX GPIO 3 RX - No es necesario
+  pinMode(buttonPin, INPUT_PULLUP); // GPIO 3 RX - Dispone de pullup interno
   pinMode(ledPin, OUTPUT);
     
   //Serial.begin(115200);
   
-  //Serial.println();
-  //Serial.println();
-  //Serial.print("Connecting to ");
-  //Serial.println(ssid);
+//  Serial.println();
+//  Serial.println();
+//  Serial.print("Connecting to ");
+//  Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -94,30 +98,30 @@ void setup() {
      }
      
 if (WiFi.status() == WL_CONNECTED){
-          //Serial.println("");
-          //Serial.println("---------------------------------------------------------");
-          //Serial.println("");
-          //Serial.println("WiFi conectado");
-          //Serial.print("IP Configurada: ");
-          //Serial.println(WiFi.localIP()); //Obtenemos la IP
-          //Serial.println("");
-          //Serial.println("---------------------------------------------------------");
-          //Serial.println("");
+//          Serial.println("");
+//          Serial.println("---------------------------------------------------------");
+//          Serial.println("");
+//          Serial.println("WiFi conectado");
+//          Serial.print("IP Configurada: ");
+//          Serial.println(WiFi.localIP()); //Obtenemos la IP
+//          Serial.println("");
+//          Serial.println("---------------------------------------------------------");
+//          Serial.println("");
   } else {
-          //Serial.println("");
-          //Serial.println("---------------------------------------------------------");
-          //Serial.println("");
-          //Serial.println("WiFi NO conectado, revise la configuración");
-          //Serial.println("Para configurar pulsar el botón de flash durante 4 sec");
-          //Serial.println("");
-          //Serial.println("---------------------------------------------------------");
-          //Serial.println("");
-          //Serial.println("Se reiniciará en 10 sec");
+//          Serial.println("");
+//          Serial.println("---------------------------------------------------------");
+//          Serial.println("");
+//          Serial.println("WiFi NO conectado, revise la configuración");
+//          Serial.println("Para configurar pulsar el botón de flash durante 4 sec");
+//          Serial.println("");
+//          Serial.println("---------------------------------------------------------");
+//          Serial.println("");
+//          Serial.println("Se reiniciará en 10 sec");
           pass = 0;
           while ((pass != 10))
                     {
                       delay(1000);
-                      //Serial.print(".");
+//                      Serial.print(".");
                       pass++;
                       
                      // if (digitalRead(0) == 0){
@@ -130,20 +134,21 @@ if (WiFi.status() == WL_CONNECTED){
 //-----------MQTT----------------------------
 
   client.setServer(mqttServer, mqttPort);
-  client.setCallback(callback);
+  delay(3000);
+  client.setCallback(callback); //SI descomento me da un error de memoria
 
   while (!client.connected()) {
-    //Serial.println("Connecting to MQTT...");
+//    Serial.println("Connecting to MQTT...");
 
     if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
-       //Serial.println("connected");
+//       Serial.println("connected");
        client.publish(topicLog, toCharFunction(espName+" - Conectado!"));
        client.subscribe(toCharFunction(topicMode));
        client.subscribe(toCharFunction(topicOrders));
        client.subscribe(toCharFunction(topicGeneral));
     } else {
-      //Serial.print("failed with state ");
-      //Serial.print(client.state());
+//      Serial.print("failed with state ");
+//      Serial.print(client.state());
       delay(2000);
     }
   }
@@ -152,13 +157,14 @@ if (WiFi.status() == WL_CONNECTED){
 
 
 void loop() {
- 
+
  if (!client.connected()) {   //if no connection to mqtt brocker
   unsigned long currentTime = millis();
 
   if (currentTime - previousTime >= eventInterval) {
      mqttReconnect();
      previousTime = currentTime;
+//     Serial.println("RE_connected");
   }
  
  } else {
@@ -184,7 +190,7 @@ void loop() {
             if (buttonState != lastButtonState) {
               //Serial.println("Estado 3");
               client.publish(topicLog, toCharFunction(espName+"-Estado 3!"));
-              //sendFunction("stop,3");
+              sendFunction("stop,1");
               jump = 1;
               break;
             }
@@ -194,15 +200,15 @@ void loop() {
   if (jump == 0){        
               if (buttonState == HIGH) {
                 // if the current state is HIGH then the button went from off to on:
-                //Serial.println("on");
+//                Serial.println("on");
                 client.publish(topicLog, toCharFunction(espName+"-ON!"));
-                //sendFunction("Subir,3");
+                sendFunction("Subir,1");
           
               } else {
                 // if the current state is LOW then the button went from on to off:
-                //Serial.println("off");
+//                Serial.println("off");
                 client.publish(topicLog, toCharFunction(espName+"-OFF!"));
-                //sendFunction("abajo,3");
+                sendFunction("abajo,1");
               }
       }
     delay(50);
