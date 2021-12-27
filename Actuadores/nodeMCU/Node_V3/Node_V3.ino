@@ -1,5 +1,17 @@
-String ver = "3.2";
+String ver = "3.5";
+
 /*
+ * Version 3.5:
+ *    Añado la out D4 para la alimentación del sensor de temperatura
+ *    De esta manera se puede resetear a distancia con el comando h.
+ *    Falta configurar las señales de mqtt.
+ *    ALIMENTACION DE DHT en pin D5
+ *    
+ * Version 3.3:
+ *      Añado en callback estado de lock para no actue.
+ * Version 3.3:
+ *      Añado reset si salta el trigger de tiempo para OTA.
+ *      
  * Version 3.2:
  *      Elimino todas las conexiones serial
  *            Es necesario para la union con el FW de pulsadores y el uso de GPIO 3 en ESP01
@@ -62,6 +74,7 @@ String topicMode = "persia/"+espName+"/mode";
 String topicOrders = "persia/"+espName+"/order";
 String topicGeneral = "persia/general";
 const char* topicTemp = "persia/temp";
+boolean lock = false;
 
 String WorkMode = "";
 int waitTime;
@@ -77,6 +90,7 @@ PubSubClient client(espClient);
 //-----------ETH22------------
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 uint8_t DHTPin = D3;
+char aliDHT = D5;       //Pin de alimentacion de sensor VCC
 DHT dht(DHTPin, DHTTYPE);                
 float Temperature;
 float Humidity;
@@ -118,12 +132,14 @@ void setup() {
 //---------- Solve Excepcion 3 when connect to wifi
 WiFi.persistent(false);
 WiFi.disconnect(true);
+Serial.begin(9600);
+Serial.println(F("DHTxx test!"));
 //----------------------
 
 delay(10);
 
-//strcat(wifi_ssid_private, "");
-//strcat(wifi_password_private, "");
+strcat(wifi_ssid_private, "");
+strcat(wifi_password_private, "");
 
   
 // ---- Leer los datos de configuracion desde EEPROM
@@ -136,12 +152,20 @@ readEEPROM(96,16,egateway);
 readEEPROM(112,3,Temp_type);
 
 
+//strcpy(wifi_ssid_private, "ChachiNet");
+//strcpy(wifi_password_private, "Et-micasa");
+
 
 //---- Convertir los resultados de string a IPADDRES----------
 
 ip.fromString(ipAddr);
 subnet.fromString(esubnet);
 gateway.fromString(egateway);
+
+Serial.println(wifi_ssid_private);
+Serial.println(wifi_password_private);
+Serial.println(ip);
+Serial.println(subnet);
 
 delay(500);
 
@@ -155,6 +179,9 @@ delay(500);
   
   pinMode(outB, OUTPUT);
   digitalWrite(outB, bajo);
+
+  pinMode(aliDHT, OUTPUT);    //Alimentación de sensor de temperatura
+  digitalWrite(aliDHT, HIGH);
 
   pinMode(0, INPUT); // Boton de flash como entrada para web config
   
@@ -173,10 +200,13 @@ delay(500);
   
   while ((WiFi.status() != WL_CONNECTED) and (pass != 15))
   {
+    Serial.print(".");
     delay(500);
     pass++;
     
   }
+  Serial.println("conectado");
+  Serial.println(WiFi.localIP());
 
   if (WiFi.status() == WL_CONNECTED){
           
@@ -212,6 +242,7 @@ delay(500);
        client.subscribe(toCharFunction(topicTemp));
     } else {
       delay(2000);
+      Serial.println("NO");
     }
   }
   
@@ -330,7 +361,21 @@ if ((WorkMode == "auto") and (millis() > initialWaitTime + waitTime)){
               client.println("1");
             }
         
-        
+            if (linea1 == "h" ) {
+
+              client.println("1");
+              
+              digitalWrite(aliDHT, LOW);        //detengo la alimentación del sensor de temperatura  
+                
+                delay(2500);
+                
+              digitalWrite(aliDHT, HIGH);         // activo la alimentación del sensor de temperatura                  
+              
+              pinMode(DHTPin, INPUT); // Lectura Eth22
+              dht.begin();
+              
+            }
+            
             if (linea1 == "z" ) {
               digitalWrite(outB, bajo);          //detengo rele de subida
               digitalWrite(outS, bajo);         // detengo el rele de bajada

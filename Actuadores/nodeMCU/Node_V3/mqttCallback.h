@@ -34,7 +34,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
                       
                 if (Mode == "OTA" ) {
                         Serial.println("Modo OTA");
-                        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}"));
+                        //client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}"));
+                        client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"lock\": \""+lock+"\"}"));
                         client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"mode\": \"OTA->ON\"}"));
                         OTA();
                     }
@@ -48,7 +49,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
               Serial.println(order);
               Serial.println("-----------------------------------------");
               Serial.println("");
-                
+              
+                if (order == "lock" ) {
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\":\"locked\"}"));
+                      lock = true;
+                      delay(200);
+                    }
+                if (order == "unlock" ) {
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\":\"Unlocked\"}"));
+                      lock = false;
+                      delay(200);
+                    }
+                    
                 if (order == "test" ) {
                       client.publish(topicLog, toCharFunction("12345678901234567890123456789012345678901234567890"));
                       delay(200);
@@ -61,11 +73,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
                     }
                     
                 if (order == "getInfo" ) {
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}")); 
+                      //client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}")); 
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"lock\": \""+lock+"\"}"));
                     }
 
                 if (order == "help" ) {
-                      client.publish(topicLog, toCharFunction("O:test,O:restart,O:getInfo,O:getTemp,M:auto,M:manual"));
+                      client.publish(topicLog, toCharFunction("O:lock,O:unlock,O:test,O:restart,O:getInfo,O:getTemp,M:auto,M:manual"));
                     }
                     
                 if (order == "getTemp" ) {
@@ -74,25 +87,32 @@ void callback(char* topic, byte* payload, unsigned int length) {
                       client.publish(topicTemp, toCharFunction("{\"disp\": \""+espName+"\",\"Temperatura\": \""+String(Temperature)+"\",\"Humedad\": \""+String(Humidity)+"\"}"));
                     }
                  if (order == "up" ) {
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Subiendo\"}"));
-                      digitalWrite(outB, bajo);         // Detengo el rele de bajada
-                       if (accion != 0 ) {
-                          delay(500);
+                      if (lock == true){
+                            client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Lock\"}"));
+                        }else{
+                            client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Subiendo\"}"));
+                            digitalWrite(outB, bajo);         // Detengo el rele de bajada
+                             if (accion != 0 ) {
+                                delay(500);
+                              }
+                            digitalWrite(outS, alto);        //Activo rele de subida
+                            accion = 1;
                         }
-                      digitalWrite(outS, alto);        //Activo rele de subida
-                      accion = 1;
                     }
 
                 if (order == "down" ) {
-                   
-                    client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Bajando\"}"));
-                    
-                    digitalWrite(outS, bajo);        //detengo rele de subida
-                      if (accion != 0 ) {
-                        delay(500);
-                      }
-                      digitalWrite(outB, alto);         // activo el rele de bajada
-                      accion = 1;                    //Cambio la variable a movimiento
+                   if (lock == true){
+                            client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Lock\"}"));
+                        }else{
+                              client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"Accion\": \"Bajando\"}"));
+                              
+                              digitalWrite(outS, bajo);        //detengo rele de subida
+                                if (accion != 0 ) {
+                                  delay(500);
+                                }
+                                digitalWrite(outB, alto);         // activo el rele de bajada
+                                accion = 1;                    //Cambio la variable a movimiento
+                                  }
                         }
 
 
@@ -117,7 +137,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
               Serial.println("");
 
               if (order == "getInfo" ) {
-                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"staus\": \"alive\"}")); 
+                      client.publish(topicLog, toCharFunction("{\"disp\": \""+espName+"\",\"version\": \""+String(ver)+"\",\"IP\": \""+WiFi.localIP().toString()+"\",\"MAC\": \""+WiFi.macAddress()+"\",\"lock\": \""+lock+"\"}")); 
                     }
           
         }
