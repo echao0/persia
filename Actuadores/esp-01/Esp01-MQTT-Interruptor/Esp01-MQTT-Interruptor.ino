@@ -1,4 +1,7 @@
   /*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+   * Verison  ESP01-V4.1
+   *  Añado reset en si salta el trigger en OTA // Esp01 30s max
+   *  
  * Verison  ESP01-V4
  *  Version para los interruptores
  *  Funciona el callback y se le pueden dar ordenes 
@@ -20,8 +23,8 @@
 #endif
 
 //-----------NAME----------------------------
-const char* ver = "ESP01-V4";
-String espName = "test";
+const char* ver = "ESP01-V4.1";
+String espName = "pul3";
 
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
@@ -33,8 +36,8 @@ String topicGeneral = "persia/general";
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "test"; //test:test ; pul3:hola
-const char* mqttPassword = "test";
+const char* mqttUser = "pul2"; //test:test ; pul3:hola
+const char* mqttPassword = "hola";
 
 String WorkMode = "";
 int waitTime;
@@ -190,7 +193,7 @@ void loop() {
             if (buttonState != lastButtonState) {
               //Serial.println("Estado 3");
               client.publish(topicLog, toCharFunction(espName+"-Estado 3!"));
-              sendFunction("stop,1");
+              sendFunction("stop,3");
               jump = 1;
               break;
             }
@@ -202,13 +205,13 @@ void loop() {
                 // if the current state is HIGH then the button went from off to on:
 //                Serial.println("on");
                 client.publish(topicLog, toCharFunction(espName+"-ON!"));
-                sendFunction("Subir,1");
+                sendFunction("Subir,3");
           
               } else {
                 // if the current state is LOW then the button went from on to off:
 //                Serial.println("off");
                 client.publish(topicLog, toCharFunction(espName+"-OFF!"));
-                sendFunction("abajo,1");
+                sendFunction("abajo,3");
               }
       }
     delay(50);

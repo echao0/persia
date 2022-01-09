@@ -6,7 +6,7 @@ void OTA(){
     
       uint16_t time_start = 0;
       uint16_t time_actual = 0;
-      int trigger = 300000;
+      int trigger = 120000; //tras dos minutos sin recibir OTA reinicio
       
       // Port defaults to 8266
       // ArduinoOTA.setPort(8266);
@@ -59,5 +59,7 @@ void OTA(){
         delay(10);
         }
       Serial.println("Tiempo acabado");
-  
+      client.publish(topicLog, "tiempo acabado de OTA");
+      delay(100);
+      ESP.reset();
   }
