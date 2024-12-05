@@ -1,7 +1,14 @@
-  /*RECORDAR LA RESISTENCIA - NO ES NECESARIA
+ /* Verison  ESP01-V5.0
+ *  Version para los interruptores MQTT (SOLO)
+ *  Modificado para Home assistant
+ *  En la versión anterior tardaba mucho en enviar la orden MQTT
+
+  RECORDAR LA RESISTENCIA - NO ES NECESARIA
    * Verison  ESP01-V4.1
    *  Añado reset en si salta el trigger en OTA // Esp01 30s max
    *  
+
+
  * Verison  ESP01-V4
  *  Version para los interruptores
  *  Funciona el callback y se le pueden dar ordenes 
@@ -23,20 +30,23 @@
 #endif
 
 //-----------NAME----------------------------
-const char* ver = "ESP01-V4.1";
+const char* ver = "ESP01-V5.0";
 String espName = "pul3";
 
 //-----------MQTT----------------------------
 const char* topicConnect = "persia/connect";
 const char* topicLog = "persia/log";
+const char* topicStatus = "persia/switch/status";
+
 String topicMode = "persia/"+espName+"/mode";
-String topicOrders = "persia/"+espName+"/order";
+String topicOrders = "persia/"+espName;
 String topicGeneral = "persia/general";
+//String topicStatus = "persia/switch"+espName+"/status";
 
 
 const char* mqttServer = "192.168.3.181";
 const int mqttPort = 1883;
-const char* mqttUser = "pul2"; //test:test ; pul3:hola
+const char* mqttUser = "pul3"; //test:test ; pul3:hola
 const char* mqttPassword = "hola";
 
 String WorkMode = "";
@@ -78,16 +88,15 @@ int jump = 0; //State 3 detected
 //-----------------Program----------------------
 
 void setup() {
-  //pinMode(buttonPin, FUNCTION_3); // GPIO 1 TX GPIO 3 RX - No es necesario
   pinMode(buttonPin, INPUT_PULLUP); // GPIO 3 RX - Dispone de pullup interno
   pinMode(ledPin, OUTPUT);
     
   //Serial.begin(115200);
   
-//  Serial.println();
-//  Serial.println();
-//  Serial.print("Connecting to ");
-//  Serial.println(ssid);
+  //Serial.println();
+  //Serial.println();
+  //Serial.print("Connecting to ");
+  //Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -96,7 +105,7 @@ void setup() {
   
   while ((WiFi.status() != WL_CONNECTED) and (pass != 15)) {
       delay(500);
-      //Serial.print(".");
+    //  Serial.print(".");
       pass++;
      }
      
@@ -141,17 +150,18 @@ if (WiFi.status() == WL_CONNECTED){
   client.setCallback(callback); //SI descomento me da un error de memoria
 
   while (!client.connected()) {
-//    Serial.println("Connecting to MQTT...");
+  //  Serial.println("Connecting to MQTT...");
 
     if (client.connect(toCharFunction(espName), mqttUser, mqttPassword )) {
-//       Serial.println("connected");
+   //    Serial.println("connected");
        client.publish(topicLog, toCharFunction(espName+" - Conectado!"));
        client.subscribe(toCharFunction(topicMode));
        client.subscribe(toCharFunction(topicOrders));
        client.subscribe(toCharFunction(topicGeneral));
+       client.subscribe(toCharFunction(topicStatus));
     } else {
-//      Serial.print("failed with state ");
-//      Serial.print(client.state());
+    //  Serial.print("failed with state ");
+    //  Serial.print(client.state());
       delay(2000);
     }
   }
@@ -192,8 +202,8 @@ void loop() {
             
             if (buttonState != lastButtonState) {
               //Serial.println("Estado 3");
-              client.publish(topicLog, toCharFunction(espName+"-Estado 3!"));
-              sendFunction("stop,3");
+              client.publish(topicStatus, toCharFunction(espName+"-Stop"));
+             // sendFunction("stop,3");
               jump = 1;
               break;
             }
@@ -204,14 +214,14 @@ void loop() {
               if (buttonState == HIGH) {
                 // if the current state is HIGH then the button went from off to on:
 //                Serial.println("on");
-                client.publish(topicLog, toCharFunction(espName+"-ON!"));
-                sendFunction("Subir,3");
+                client.publish(topicStatus, toCharFunction(espName+"-On"));
+//                sendFunction("Subir,3");
           
               } else {
                 // if the current state is LOW then the button went from on to off:
 //                Serial.println("off");
-                client.publish(topicLog, toCharFunction(espName+"-OFF!"));
-                sendFunction("abajo,3");
+                client.publish(topicStatus, toCharFunction(espName+"-Off"));
+//                sendFunction("abajo,3");
               }
       }
     delay(50);

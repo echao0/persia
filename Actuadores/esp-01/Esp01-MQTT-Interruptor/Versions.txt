@@ -1,3 +1,8 @@
+V5:
+	Mejoro la respuesta MQTT y funciona Correctamente
+	Cambio el topic de los estados
+	FALTA: Crear un topic para cada uno de los interruptores...
+
 V3:
 	Utilizo - Gpio3 RX pin
 		Se soluciona el problema de reinicio cuando Gpio2 esta activada
